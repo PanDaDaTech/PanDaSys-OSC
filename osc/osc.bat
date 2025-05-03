@@ -1,7 +1,7 @@
 chcp 936 > nul
 setlocal EnableDelayedExpansion
 @echo off
-title 潇然系统优化组件 XRSYS-OSC
+title 潇然系统优化组件 For PanDaSys XRSYS-OSC For PanDaSys
 cd /d "%~dp0"
 if exist "%systemdrive%\Windows\SysWOW64\wscript.exe" (
     set "PROCESSOR_ARCHITECTURE=AMD64"
@@ -37,15 +37,6 @@ mkdir "%SystemDrive%\Windows\Setup"
 mkdir "%SystemDrive%\Windows\Setup\Run"
 echo successful>"%SystemDrive%\Windows\Setup\oscrunstate.txt"
 
-@rem :oscapifiles
-@rem rem 为api提供文件
-@rem if exist "%SystemDrive%\Windows\Setup\Set\needoscapifiles.txt" (
-@rem     mkdir ..\apifiles
-@rem     copy /y apifiles ..\apifiles
-@rem     del /f /q "%SystemDrive%\Windows\Setup\Set\needoscapifiles.txt"
-@rem     goto endoff
-@rem )
-
 :checkenv_generalize
 echo 检测是否在部署阶段中运行
 if exist "%SystemDrive%\Windows\Setup\State\State.ini" (
@@ -56,19 +47,15 @@ if exist "%SystemDrive%\Windows\Setup\State\State.ini" (
 )
 
 :checkenv_winpe
-echo 检测是否在PE系统中运行
+echo 检测是否在 PE 系统中运行
 if /i "%SystemDrive%"=="x:" if exist "X:\Windows\System32\PECMD.EXE" (
-    echo 不支持在PE系统中运行
+    echo 不支持在 PE 系统中运行
     goto endoff
 )
 
 :mainprogram
-echo 潇然系统盗版提示
-reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v legalnoticecaption /t REG_SZ /d "警告：您的系统可能没有部署完整（OSC）" /f
-reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v legalnoticetext /t REG_SZ /d "这通常是网络连接不稳定或部署程序BUG导致的，请在点击【确定】登录账户后，访问http://url.xrgzs.top/osc下载、重新运行osc.exe尝试解决。此提示每次登录前都会强制弹出，如有特殊情况请联系我们解决。" /f
-
 if %osver% GEQ 3 (
-    echo win8-11系统APPX、WD处理
+    echo Win8-11 系统 APPX、WD 处理
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
@@ -85,24 +72,24 @@ if %osver% GEQ 3 (
     echo noway>"%CommonProgramFiles%\microsoft shared\ClickToRun\OnlineInteraction"
 )
 
-echo 创建runonce自删清理脚本...
+echo 创建 runonce 自删清理脚本...
 if %osver% GEQ 2 (
 	copy /y runonce.bat "%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Startup\"
 ) else (
     copy /y runonce.bat "%ALLUSERSPROFILE%\「开始」菜单\程序\启动\"
 )
 
-if not exist "%SystemDrive%\Windows\Setup\Set\xrsysstepapi5.flag" (
+if not exist "%SystemDrive%\Windows\Setup\Set\pandasysstepapi5.flag" (
     start "" "%pecmd%" LOAD "%~dp0apifiles\Wall.wcs"
 )
 
 :copytags
-echo 拷贝相关TAG文件
+echo 拷贝相关 TAG 文件
 mkdir "%SystemDrive%\Windows\Setup\"
 for %%a in (C D E F G H) do (
     move /y "%%a:\zjsoft*.txt" "%SystemDrive%\Windows\Setup"
-    move /y "%%a:\xrok*.txt" "%SystemDrive%\Windows\Setup"
-    move /y "%%a:\xrsys*.txt" "%SystemDrive%\Windows\Setup"
+    move /y "%%a:\pdtechrc*.txt" "%SystemDrive%\Windows\Setup"
+    move /y "%%a:\pandasys*.txt" "%SystemDrive%\Windows\Setup"
 )
 
 :oscdrivers
@@ -125,32 +112,32 @@ powercfg setactive SCHEME_MAX && powercfg -x -disk-timeout-ac 0
 powercfg setactive SCHEME_MIN && powercfg -x -disk-timeout-ac 0
 rem 安装驱动
 if exist wandrv.iso (
-    echo [OSC]正在应用万能驱动wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用万能驱动 wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
     md wandrv
     move /y "%~dp0wandrv.iso" "%~dp0wandrv\wandrv.iso"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv\DriveCleaner.exe"
     start "" /wait "%~dp0wandrv\DriveCleaner.exe" /wandrv
-    echo wandrv.iso>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo wandrv.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 )
 if exist wandrv2.iso (
-    echo [OSC]正在应用万能驱动wandrv2.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用万能驱动 wandrv2.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
     md wandrv2
     move /y "%~dp0wandrv2.iso" "%~dp0wandrv2\wandrv.iso"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv2\DriveCleaner.exe"
     start "" /wait "%~dp0wandrv2\DriveCleaner.exe" /wandrv
-    echo wandrv2.iso>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo wandrv2.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 )
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\OSC\DriverBackup.7z" (
+        if exist "%%a:\PanDaTech\OSC\DriverBackup.7z" (
             echo [OSC]正在导入搜到的驱动备份%%a:\~\DriverBackup.7z...>"%systemdrive%\Windows\Setup\wallname.txt"
-            start "" /wait "%drvindex%" -b "%%a:\Xiaoran\OSC\DriverBackup.7z"
+            start "" /wait "%drvindex%" -b "%%a:\PanDaTech\OSC\DriverBackup.7z"
         )
-        if exist "%%a:\Xiaoran\OSC\wandrv.iso" (
+        if exist "%%a:\PanDaTech\OSC\wandrv.iso" (
             echo [OSC]正在应用搜到的万能驱动%%a:\~\wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
-            copy /y "%~dp0apifiles\DriveCleaner.exe" "%%a:\Xiaoran\OSC\DriveCleaner.exe"
-            start "" /wait "%%a:\Xiaoran\OSC\DriveCleaner.exe" /wandrv
-            echo %%a:\Xiaoran\OSC\wandrv.iso>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+            copy /y "%~dp0apifiles\DriveCleaner.exe" "%%a:\PanDaTech\OSC\DriveCleaner.exe"
+            start "" /wait "%%a:\PanDaTech\OSC\DriveCleaner.exe" /wandrv
+            echo %%a:\PanDaTech\OSC\wandrv.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
         )
     )
 )
@@ -167,9 +154,9 @@ if exist "themerec\themerec.bat" echo y | start "" /wait /min "themerec\themerec
 
 :changepcname
 echo 修改机器号
-if exist "%SystemDrive%\Windows\Setup\xrsysnopcname.txt" goto changepasswd
-if exist "%SystemDrive%\Windows\Setup\xrsyspcname.txt" (
-    set /p pcname=<"%SystemDrive%\Windows\Setup\xrsyspcname.txt"
+if exist "%SystemDrive%\Windows\Setup\pandasysnopcname.txt" goto changepasswd
+if exist "%SystemDrive%\Windows\Setup\pandasyspcname.txt" (
+    set /p pcname=<"%SystemDrive%\Windows\Setup\pandasyspcname.txt"
 )
 if defined pcname (
     set "pcname=%pcname: =%"
@@ -211,9 +198,9 @@ reg add "HKU\.DEFAULT\Software\Microsoft\Windows\ShellNoRoam" /f /ve /t REG_SZ /
 
 :changepasswd
 setlocal enabledelayedexpansion
-if exist "%systemdrive%\Windows\Setup\xrsyspasswd.txt" (
-    set /p passwd=<"%SystemDrive%\Windows\Setup\xrsyspasswd.txt"
-    del /f /q "%SystemDrive%\Windows\Setup\xrsyspasswd.txt"
+if exist "%systemdrive%\Windows\Setup\pandasyspasswd.txt" (
+    set /p passwd=<"%SystemDrive%\Windows\Setup\pandasyspasswd.txt"
+    del /f /q "%SystemDrive%\Windows\Setup\pandasyspasswd.txt"
     if not defined passwd set passwd=1
     if defined passwd set "passwd=!passwd: =!"
     if "!passwd!"=="1" set passwd=PassWd@123
@@ -225,8 +212,8 @@ endlocal
 echo 还原备份的WIFI密码
 if %osver% GEQ 2 (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\WLANPassword\*.xml" (
-            FORFILES /P "%%a:\Xiaoran\WLANPassword" /M *.xml /C "cmd /c netsh wlan add profile filename=@path"
+        if exist "%%a:\PanDaTech\WLANPassword\*.xml" (
+            FORFILES /P "%%a:\PanDaTech\WLANPassword" /M *.xml /C "cmd /c netsh wlan add profile filename=@path"
         )
         if exist "%%a:\WLANPassword\*.xml" (
             FORFILES /P "%%a:\WLANPassword" /M *.xml /C "cmd /c netsh wlan add profile filename=@path"
@@ -237,7 +224,7 @@ if %osver% GEQ 2 (
         if "%%i"=="GUID:" (
             set GUID=%%j
             for %%a in (C D E F G H) do (
-                for %%b in ("%%a:\Xiaoran\WLANPassword\*.xml") DO (
+                for %%b in ("%%a:\PanDaTech\WLANPassword\*.xml") DO (
                     %wlan% sp !GUID! "%%b"
                 )
             )
@@ -247,9 +234,9 @@ if %osver% GEQ 2 (
 
 :restoreip
 setlocal enabledelayedexpansion
-if exist "%systemdrive%\Windows\Setup\xrsysnodhcp.txt" (
+if exist "%systemdrive%\Windows\Setup\pandasysnodhcp.txt" (
     for /f "tokens=3*" %%i in ('netsh interface show interface ^|findstr /I /R "本地.* 以太.* Local.* Ethernet" ^|findstr /I /R "已连接"') do (set EthName=%%j)
-    for /f "tokens=1,2* delims==" %%i in (%systemdrive%\Windows\Setup\xrsysnodhcp.txt) do (set %%i=%%j)
+    for /f "tokens=1,2* delims==" %%i in (%systemdrive%\Windows\Setup\pandasysnodhcp.txt) do (set %%i=%%j)
     if defined EthName (
         if defined address if defined mask if defined gateway netsh -c interface ip set address name="!EthName!" source=static address=!address: =! mask=!mask: =! gateway=!gateway: =!
         if not defined dns1 set dns1=223.5.5.5& set dns2=119.29.29.29
@@ -262,7 +249,7 @@ endlocal
 
 
 :configurefirewall
-if exist "%systemdrive%\Windows\Setup\xrsysfirewall.txt" (
+if exist "%systemdrive%\Windows\Setup\pandasysfirewall.txt" (
     echo 打开防火墙
     netsh advfirewall set currentprofile state on
     netsh firewall set opmode mode=enable
@@ -272,14 +259,13 @@ if exist "%systemdrive%\Windows\Setup\xrsysfirewall.txt" (
     netsh advfirewall set allprofiles firewallpolicy blockinbound,allowoutbound
     netsh advfirewall set allprofiles settings inboundusernotification enable
     netsh advfirewall set allprofiles settings unicastresponsetomulticast enable
-    @rem netsh advfirewall set allprofiles logging filename %SystemRoot%\System32\LogFiles\Firewall\pfirewall.log
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /f /v "EnableFirewall" /t reg_dword /d 1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /f /v "DisableNotifications" /t reg_dword /d 0
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /f /v "EnableFirewall" /t reg_dword /d 1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /f /v "DisableNotifications" /t reg_dword /d 0
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /f /v "EnableFirewall" /t reg_dword /d 1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile" /f /v "DisableNotifications" /t reg_dword /d 0
-) else if exist "%systemdrive%\Windows\Setup\xrsysnofirewall.txt" (
+) else if exist "%systemdrive%\Windows\Setup\pandasysnofirewall.txt" (
     echo 关闭防火墙
     netsh advfirewall set currentprofile state off
     netsh firewall set opmode mode=disable
@@ -293,9 +279,9 @@ if exist "%systemdrive%\Windows\Setup\xrsysfirewall.txt" (
 
 :configurerdp
 set rdpport=3389
-if exist "%systemdrive%\Windows\Setup\xrsysrdp.txt" (
+if exist "%systemdrive%\Windows\Setup\pandasysrdp.txt" (
     echo 打开RDP
-    set /p rdpportnew=<"%SystemDrive%\Windows\Setup\xrsysrdp.txt"
+    set /p rdpportnew=<"%SystemDrive%\Windows\Setup\pandasysrdp.txt"
     if not "!rdpportnew: =!"=="" if !rdpportnew! GEQ 2 if !rdpportnew! LEQ 65535 set rdpport=!rdpportnew!
     netsh firewall set portopening protocol=ALL port=!rdpport: =! name=RDP mode=ENABLE scope=ALL profile=ALL
     netsh firewall set portopening protocol=ALL port=!rdpport: =! name=RDP mode=ENABLE scope=ALL profile=CURRENT
@@ -315,53 +301,47 @@ if exist "runtime\runtime.bat" echo y | start "" /wait /min "runtime\runtime.bat
 
 :oscapis
 echo 应用OSCAPI
-if exist "%SystemDrive%\Windows\Setup\zjsoftxrsoftno.txt" (
-    del /f /q "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe"
-)
-if exist "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe" (
-    start "" "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe" /S
-)
 if exist "%SystemDrive%\Windows\Setup\Set\osc\Office\Office_*.iso" (
-    echo [OSC]正在应用OfficeISO...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用 OfficeISO...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /min /wait cmd /c "%SystemDrive%\Windows\Setup\Set\osc\Office\MSOInst.bat"
 )
 if exist "%SystemDrive%\Windows\Setup\Run\1\api1.bat" (
-    echo [OSC]正在应用DIY接口api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用DIY接口 api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /max /wait "%SystemDrive%\Windows\Setup\Run\1\api1.bat"
 )
 for %%b in (%SystemDrive%\Windows\Setup\Run\1\*.exe) do (
-    echo [OSC]正在安装%%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在安装 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%b" /S
     del /f /q "%%b"
 )
 for %%b in (%SystemDrive%\Windows\Setup\Run\1\*.msi) do (
-    echo [OSC]正在安装%%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在安装 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%b" /passive /qb-! /norestart
     del /f /q "%%b"
 )
 for %%b in (%SystemDrive%\Windows\Setup\Run\1\*.reg) do (
-    echo [OSC]正在应用%%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
     regedit /s "%%b"
     del /f /q "%%b"
 )
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\OSC\api1.bat" (
-            echo [OSC]正在应用搜到的DIY接口%%a:\~\api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
-            echo y | start "" /max /wait "%%a:\Xiaoran\OSC\api1.bat"
+        if exist "%%a:\PanDaTech\OSC\api1.bat" (
+            echo [OSC]正在应用搜到的 DIY 接口 %%a:\~\api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+            echo y | start "" /max /wait "%%a:\PanDaTech\OSC\api1.bat"
         )
-        for %%b in (%%a:\Xiaoran\OSC\1\*.exe) do (
-            echo [OSC]正在运行搜到的%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\OSC\1\*.exe) do (
+            echo [OSC]正在运行搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /S
             del /f /q "%%b"
         )
-        for %%b in (%%a:\Xiaoran\OSC\1\*.msi) do (
-            echo [OSC]正在安装搜到的%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\OSC\1\*.msi) do (
+            echo [OSC]正在安装搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /passive /qb-! /norestart
             del /f /q "%%b"
         )
-        for %%b in (%%a:\Xiaoran\OSC\1\*.reg) do (
-            echo [OSC]正在应用搜到的%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\OSC\1\*.reg) do (
+            echo [OSC]正在应用搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             regedit /s "%%b"
             del /f /q "%%b"
         )
@@ -369,7 +349,7 @@ if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
 )
 
 :xrkms
-echo 应用XRKMS
+echo 应用 XRKMS
 if exist "xrkms\xrkms.bat" (
     echo [OSC]正在智能激活系统（可能需要3min）>"%systemdrive%\Windows\Setup\wallname.txt"
     timeout /t 3
@@ -377,35 +357,35 @@ if exist "xrkms\xrkms.bat" (
 )
 
 :osconline
-echo 应用OSConline
-echo [OSC]正在应用OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
+echo 应用 OSConline
+echo [OSC]正在应用 OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "online.bat" echo y | start "" /wait /min "online.bat"
 
 :afterlife
-echo [OSC]正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
 if %osver% EQU 2 (
-    echo win7系统WU服务处理
-    echo yes>"%systemdrive%\Windows\Setup\xrsysnowu.txt"
+    echo Win7系统 WU 服务处理
+    echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 if %osver% EQU 3 (
-    echo Win8启用UAC
-    echo yes>"%systemdrive%\Windows\Setup\xrsysuac.txt"
-    echo win8系统WU服务处理
-    echo yes>"%systemdrive%\Windows\Setup\xrsysnowu.txt"
+    echo Win8 启用UAC
+    echo yes>"%systemdrive%\Windows\Setup\pandasysuac.txt"
+    echo Win8系统WU服务处理
+    echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 
 if %osver% EQU 4 (
-    echo win10+系统WU服务处理
-    echo yes>"%systemdrive%\Windows\Setup\xrsyswu.txt"
+    echo Win10+ 系统WU服务处理
+    echo yes>"%systemdrive%\Windows\Setup\pandasyswu.txt"
 )
 
 :disablewu
-echo 按需关闭WU
-if exist "%systemdrive%\Windows\Setup\xrsyswu.txt" (
+echo 按需关闭 WU
+if exist "%systemdrive%\Windows\Setup\pandasyswu.txt" (
     start "" /wait /min "%~dp0apifiles\Wub.exe" /E
-) else if exist "%systemdrive%\Windows\Setup\xrsysfkwu.txt" (
+) else if exist "%systemdrive%\Windows\Setup\pandasysfkwu.txt" (
     start "" /wait /min "%~dp0apifiles\Wub.exe" /D /P
-) else if exist "%systemdrive%\Windows\Setup\xrsysnowu.txt" (
+) else if exist "%systemdrive%\Windows\Setup\pandasysnowu.txt" (
     start "" /wait /min "%~dp0apifiles\Wub.exe" /D
 )
 

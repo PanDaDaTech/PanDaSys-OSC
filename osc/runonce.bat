@@ -7,7 +7,7 @@ tasklist | find /i "PECMD.exe" && exit
 type "%SystemDrive%\Windows\Setup\oscstate.txt" | find /i "successfuldel" || exit
 
 rem if uac is to be enabled, disable desktop and do reboot
-if exist "%systemdrive%\Windows\Setup\xrsysuac.txt" (
+if exist "%systemdrive%\Windows\Setup\pandasysuac.txt" (
     taskkill /f /im explorer.exe
 )
 rem delete desktop icons which is installed by accident and do not use anymore
@@ -85,7 +85,7 @@ rd /s /q "%SystemDrive%\wandrv"
 rem delete cxsoft xiaoranosc heu...
 del /f /s /q "%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Startup\*.vbs"
 del /f /q "%SystemDrive%\Windows\Setup\oscrunstate.txt"
-del /f /q "%SystemDrive%\Windows\Setup\xrsyspasswd.txt"
+del /f /q "%SystemDrive%\Windows\Setup\pandasyspasswd.txt"
 del /f /q "%SystemDrive%\Windows\CxSoftQii.ini"
 rd /s /q "%SystemDrive%\Windows\OsConfig"
 rd /s /q "%SystemDrive%\Windows\Setup\Run"
@@ -113,10 +113,10 @@ del /f /q "%SystemDrive%\Windows\reg.ini"
 del /f /q "%SystemDrive%\Windows\regini.ini"
 for /f "delims=" %%a in ('dir /b /a %systemdrive%\~EasyDrv.Temp.*') do rd /s /q "%systemdrive%\%%a"
 
-@rem for %%a in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
-@rem     attrib -s -h -r "%%a:\~WTDR.Pack_Temp" /D
-@rem     rd /s /q "%%a:\~WTDR.Pack_Temp"
-@rem )
+ for %%a in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
+    attrib -s -h -r "%%a:\~WTDR.Pack_Temp" /D
+    rd /s /q "%%a:\~WTDR.Pack_Temp"
+)
 del /f /s /q "%SystemDrive%\Windows\Setup\Set\*"
 rd /s /q "%SystemDrive%\Windows\Setup\Set"
 del /f /q "%SystemDrive%\Windows\Panther\unattend.xml"
@@ -148,7 +148,7 @@ bcdedit /? >nul && bcdedit /timeout 3
 echo successfulrunonce>"%SystemDrive%\Windows\Setup\oscstate.txt"
 
 rem enable uac
-if exist "%systemdrive%\Windows\Setup\xrsysuac.txt" (
+if exist "%systemdrive%\Windows\Setup\pandasysuac.txt" (
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 1 /f
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "PromptOnSecureDesktop" /t REG_DWORD /d 1 /f
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorAdmin" /t REG_DWORD /d 5 /f
