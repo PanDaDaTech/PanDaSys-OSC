@@ -1,10 +1,10 @@
 ﻿Unicode true
 ; 安装程序初始定义常量
-!define PRODUCT_NAME "潇然系统"
-!define PRODUCT_DESC "潇然系统优化组件"
+!define PRODUCT_NAME "PanDaSys"
+!define PRODUCT_DESC "潇然系统优化组件 For PanDaSys"
 ; !define /date PRODUCT_VERSION "3.24.%m.%d"
-!define PRODUCT_PUBLISHER "Xiaoran Studio"
-!define PRODUCT_WEB_SITE "https://xrgzs.github.io/"
+!define PRODUCT_PUBLISHER "Xiaoran Studio & PanDaTech"
+!define PRODUCT_WEB_SITE "https://www.pandadatech.cn"
 !define PRODUCT_VERSION "${CUSTOM_VERSION}"
 
 ; 实测不压固实更小
@@ -95,93 +95,93 @@ VIAddVersionKey LegalCopyright "Copyright @ 2024 ${PRODUCT_PUBLISHER}. All Right
 VIAddVersionKey InternalName "${PRODUCT_NAME}" ;内部名称
 VIAddVersionKey LegalTrademarks "${PRODUCT_PUBLISHER}" ;合法商标 ;
 VIAddVersionKey OriginalFilename "osc.exe" ;源文件名
-VIAddVersionKey PrivateBuild "XRSYS" ;个人内部版本说明
+VIAddVersionKey PrivateBuild "PanDaSys" ;个人内部版本说明
 VIAddVersionKey SpecialBuild "NSIS" ;特殊内部版本说明
 
 
-Section /o "-潇然系统部署接口-部署前" XRAPI1
-  ${If} ${FileExists} "$INSTDIR\xrsysstepapifiles.flag"
-    DetailPrint "APIFILES已经解压，跳过此操作！"
+Section /o "-PanDaSys 部署接口 - 部署前" PanDaSysAPI1
+  ${If} ${FileExists} "$INSTDIR\pandasysstepapifiles.flag"
+    DetailPrint "APIFILES 已经解压，跳过此操作！"
   ${Else}
 	  SetOutPath "$INSTDIR\apifiles"
 	  SetOverwrite on
-	  DetailPrint "解压APIFILES..."
+	  DetailPrint "解压 APIFILES..."
 	  File /r ".\osc\apifiles\*.*"
-    FileOpen $0 "$INSTDIR\xrsysstepapifiles.flag" w
+    FileOpen $0 "$INSTDIR\pandasysstepapifiles.flag" w
     FileClose $0
   ${EndIf}
 
-  ${If} ${FileExists} "$INSTDIR\xrsysstepapi1.flag"
-    DetailPrint "API1已经执行，跳过此操作！"
+  ${If} ${FileExists} "$INSTDIR\pandasysstepapi1.flag"
+    DetailPrint "API1 已经执行，跳过此操作！"
   ${Else}
-    FileOpen $0 "$INSTDIR\xrsysstepapi1.flag" w
+    FileOpen $0 "$INSTDIR\pandasysstepapi1.flag" w
     FileClose $0
     SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行API1..."
+	  DetailPrint "解压并执行 API1..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/1" SW_SHOWMINIMIZED
   ${EndIf}
 SectionEnd
 
-Section /o "-潇然系统部署接口-部署中" XRAPI2
-  ${If} ${FileExists} "$INSTDIR\xrsysstepapi2.flag"
-    DetailPrint "API2已经执行，跳过此操作！"
+Section /o "-PanDaSys 部署接口 - 部署中" PanDaSysAPI2
+  ${If} ${FileExists} "$INSTDIR\pandasysstepapi2.flag"
+    DetailPrint "API2 已经执行，跳过此操作！"
   ${Else}
-    FileOpen $0 "$INSTDIR\xrsysstepapi2.flag" w
+    FileOpen $0 "$INSTDIR\pandasysstepapi2.flag" w
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行API2..."
+	  DetailPrint "解压并执行 API2 ..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/2" SW_SHOWMINIMIZED
 	${EndIf}
 SectionEnd
 
-Section /o "-潇然系统部署接口-部署后" XRAPI3
-  ${If} ${FileExists} "$INSTDIR\xrsysstepapi3.flag"
-    DetailPrint "API3已经执行，跳过此操作！"
+Section /o "-PanDaSys 部署接口 - 部署后" PanDaSysAPI3
+  ${If} ${FileExists} "$INSTDIR\pandasysstepapi3.flag"
+    DetailPrint "API3 已经执行，跳过此操作！"
   ${Else}
-    FileOpen $0 "$INSTDIR\xrsysstepapi3.flag" w
+    FileOpen $0 "$INSTDIR\pandasysstepapi3.flag" w
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行API3..."
+	  DetailPrint "解压并执行 API3..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/3" SW_SHOWMINIMIZED
 	${EndIf}
 SectionEnd
 
-Section /o "-潇然系统部署接口-登录时" XRAPI4
-  ${If} ${FileExists} "$INSTDIR\xrsysstepapifiles.flag"
-    DetailPrint "APIFILES已经解压，跳过此操作！"
+Section /o "-PanDaSys 部署接口 - 登录时" PanDaSysAPI4
+  ${If} ${FileExists} "$INSTDIR\pandasysstepapifiles.flag"
+    DetailPrint "APIFILES 已经解压，跳过此操作！"
   ${Else}
 	  SetOutPath "$INSTDIR\apifiles"
 	  SetOverwrite on
-	  DetailPrint "解压APIFILES..."
+	  DetailPrint "解压 APIFILES..."
 	  File /r ".\osc\apifiles\*.*"
-    FileOpen $0 "$INSTDIR\xrsysstepapifiles.flag" w
+    FileOpen $0 "$INSTDIR\pandasysstepapifiles.flag" w
     FileClose $0
   ${EndIf}
 
-  ${If} ${FileExists} "$INSTDIR\xrsysstepapi4.flag"
-    DetailPrint "API4已经执行，跳过此操作！"
+  ${If} ${FileExists} "$INSTDIR\pandasysstepapi4.flag"
+    DetailPrint "API4 已经执行，跳过此操作！"
   ${Else}
-    FileOpen $0 "$INSTDIR\xrsysstepapi4.flag" w
+    FileOpen $0 "$INSTDIR\pandasysstepapi4.flag" w
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行API4..."
+	  DetailPrint "解压并执行 API4 ..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/4" SW_SHOWMINIMIZED
 	${EndIf}
 SectionEnd
 
-Section /o "-潇然系统部署接口-进桌面" XRAPI5
-  ${If} ${FileExists} "$INSTDIR\xrsysstepapi5.flag"
-    DetailPrint "API5已经执行，跳过此操作！"
+Section /o "-PanDaSys 部署接口 - 进桌面" PanDaSysAPI5
+  ${If} ${FileExists} "$INSTDIR\pandasysstepapi5.flag"
+    DetailPrint "API5 已经执行，跳过此操作！"
   ${Else}
-    FileOpen $0 "$INSTDIR\xrsysstepapi5.flag" w
+    FileOpen $0 "$INSTDIR\pandasysstepapi5.flag" w
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
@@ -197,48 +197,43 @@ SectionGroup "优化设置"
     nsExec::ExecToLog 'cmd.exe /c "del /f /q "%WinDir%\\Version.txt""'
   SectionEnd
   Section /o "自行解决正版化"
-    DetailPrint "正在输出TAG-xrsysnokms..."
-    FileOpen $0 "$WINDIR\Setup\xrsysnokms.txt" w
+    DetailPrint "正在输出 TAG - pandasysnokms..."
+    FileOpen $0 "$WINDIR\Setup\pandasysnokms.txt" w
     FileClose $0
   SectionEnd
   Section /o "禁用安装运行库"
-    DetailPrint "正在输出TAG-xrsysnoruntime..."
-    FileOpen $0 "$WINDIR\Setup\xrsysnoruntime.txt" w
+    DetailPrint "正在输出 TAG - pandasysnoruntime..."
+    FileOpen $0 "$WINDIR\Setup\pandasysnoruntime.txt" w
     FileClose $0
   SectionEnd
   Section /o "禁用安装主题"
-    DetailPrint "正在输出TAG-xrsysnotheme..."
-    FileOpen $0 "$WINDIR\Setup\xrsysnotheme.txt" w
+    DetailPrint "正在输出 TAG - pandasysnotheme..."
+    FileOpen $0 "$WINDIR\Setup\pandasysnotheme.txt" w
     FileClose $0
   SectionEnd
-  Section /o "强制禁用Windows Update"
-    DetailPrint "正在输出TAG-xrsysfkwu..."
-    FileOpen $0 "$WINDIR\Setup\xrsysfkwu.txt" w
+  Section /o "强制禁用 Windows Update"
+    DetailPrint "正在输出 TAG - pandasysfkwu..."
+    FileOpen $0 "$WINDIR\Setup\pandasysfkwu.txt" w
     FileClose $0
   SectionEnd
   Section /o "启用UAC"
-    DetailPrint "正在输出TAG-xrsysuac..."
-    FileOpen $0 "$WINDIR\Setup\xrsysuac.txt" w
+    DetailPrint "正在输出 TAG - pandasysuac..."
+    FileOpen $0 "$WINDIR\Setup\pandasysuac.txt" w
     FileClose $0
   SectionEnd
   Section /o "禁用设置机器名"
-    DetailPrint "正在输出TAG-xrsysnopcname..."
-    FileOpen $0 "$WINDIR\Setup\xrsysnopcname.txt" w
-    FileClose $0
-  SectionEnd
-  Section /o "禁用上报安装信息"
-    DetailPrint "正在输出TAG-xrsysnoupdata..."
-    FileOpen $0 "$WINDIR\Setup\xrsysnoupdata.txt" w
+    DetailPrint "正在输出 TAG - pandasysnopcname..."
+    FileOpen $0 "$WINDIR\Setup\pandasysnopcname.txt" w
     FileClose $0
   SectionEnd
 SectionGroupEnd
 
-Section "-潇然系统优化工具" XROSC
+Section "-潇然系统优化组件 For PanDaSys" XROSC
   SetOutPath "$INSTDIR\osc"
   SetOverwrite try
-  DetailPrint "解压相关OSC数据..."
+  DetailPrint "解压相关 OSC 数据..."
   File /r ".\osc\*.*"
-  DetailPrint "运行OSC主程序..."
+  DetailPrint "运行 OSC 主程序..."
   ${DisableX64FSRedirection}
   nsExec::ExecToLog "$INSTDIR\osc\osc.bat"
 SectionEnd
@@ -255,29 +250,29 @@ Function .onInit
 	${EndIf}
 	
 	${GetParameters} $0 ;获取传入参数
-  ${GetOptions} $0 "/1" $1  ;检查执行XRAPI /1参数
+  ${GetOptions} $0 "/1" $1  ;检查执行PanDaSysAPI /1参数
 	IfErrors +3 +1
 	SectionSetFlags ${XROSC} 0
-  SectionSetFlags ${XRAPI1} 1
+  SectionSetFlags ${PanDaSysAPI1} 1
   
-  ${GetOptions} $0 "/2" $1  ;检查执行XRAPI /2参数
+  ${GetOptions} $0 "/2" $1  ;检查执行PanDaSysAPI /2参数
 	IfErrors +3 +1
 	SectionSetFlags ${XROSC} 0
-  SectionSetFlags ${XRAPI2} 1
+  SectionSetFlags ${PanDaSysAPI2} 1
   
-  ${GetOptions} $0 "/3" $1  ;检查执行XRAPI /3参数
+  ${GetOptions} $0 "/3" $1  ;检查执行PanDaSysAPI /3参数
 	IfErrors +3 +1
 	SectionSetFlags ${XROSC} 0
-  SectionSetFlags ${XRAPI3} 1
+  SectionSetFlags ${PanDaSysAPI3} 1
   
-  ${GetOptions} $0 "/4" $1  ;检查执行XRAPI /4参数
+  ${GetOptions} $0 "/4" $1  ;检查执行PanDaSysAPI /4参数
 	IfErrors +3 +1
 	SectionSetFlags ${XROSC} 0
-  SectionSetFlags ${XRAPI4} 1
+  SectionSetFlags ${PanDaSysAPI4} 1
   
-  ${GetOptions} $0 "/5" $1  ;检查执行XRAPI /5参数
+  ${GetOptions} $0 "/5" $1  ;检查执行PanDaSysAPI /5参数
 	IfErrors +3 +1
 	SectionSetFlags ${XROSC} 0
-  SectionSetFlags ${XRAPI5} 1
+  SectionSetFlags ${PanDaSysAPI5} 1
   
 FunctionEnd
