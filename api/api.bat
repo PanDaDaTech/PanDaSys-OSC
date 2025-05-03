@@ -1,7 +1,6 @@
 chcp 936 > nul
 setlocal enabledelayedexpansion
 @echo off
-@REM mode con: cols=70 lines=5
 color 1f
 cd /d "%~dp0"
 if exist "%SystemDrive%\Windows\SysWOW64\wscript.exe" (
@@ -51,18 +50,15 @@ goto end
 
 :bsq
 title 部署前系统处理（请勿关闭此窗口）
-rem %pecmd% LINK %Desktop%\继续执行未完成的任务,api.exe,/5
-rem if %osver% EQU 2 (
-rem     %pecmd% DISP
-rem )
 mkdir "%SystemDrive%\Windows\Setup"
 start "" "%pecmd%" LOAD "%~dp0apifiles\Wall.wcs"
+
 for %%a in (C D E F G H) do (
     move /y "%%a:\zjsoft*.txt" "%SystemDrive%\Windows\Setup"
-    move /y "%%a:\xrok*.txt" "%SystemDrive%\Windows\Setup"
-    move /y "%%a:\xrsys*.txt" "%SystemDrive%\Windows\Setup"
+    move /y "%%a:\pdtechrc*.txt" "%SystemDrive%\Windows\Setup"
+    move /y "%%a:\pandasys*.txt" "%SystemDrive%\Windows\Setup"
 )
-echo isxrsys >"%SystemDrive%\WINDOWS\Setup\xrsys.txt"
+echo ispandasys >"%SystemDrive%\WINDOWS\Setup\pandasys.txt"
 
 if %osver% GEQ 2 (
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
@@ -72,7 +68,7 @@ if %osver% GEQ 2 (
 if %osver% GEQ 3 (
     echo 关闭保留储存
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
-    echo 处理Onedrive开机启动项
+    echo 处理 Onedrive 开机启动项
     reg delete HKU\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
     reg delete HKU\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
     echo 禁止自动安装微软电脑管家
@@ -89,27 +85,23 @@ if %osver% GEQ 3 (
     reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
 )
 
-if not exist "%SystemDrive%\WINDOWS\Setup\xrsysnoruntime.txt" (
+if not exist "%SystemDrive%\WINDOWS\Setup\pandasysnoruntime.txt" (
     if exist "osc\runtime\DirectX_Redist_Repack_x86_x64_Final.exe" (
-        echo [API]正在应用DirectX运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
+        echo [API]正在应用 DirectX 运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
         start "" /wait "osc\runtime\DirectX_Redist_Repack_x86_x64_Final.exe" /ai
-    )
-    if exist "osc\runtime\DX9.exe" (
-        echo [API]正在应用DX9运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
-        start "" /wait "osc\runtime\DX9.exe" /S
     )
 )
 
-if not exist "%SystemDrive%\Windows\Setup\Scripts\isxr.txt" rd /s /q "%SystemDrive%\Windows\Setup\Scripts"
+if not exist "%SystemDrive%\Windows\Setup\Scripts\ispandasys.txt" rd /s /q "%SystemDrive%\Windows\Setup\Scripts"
 
 :: 扩展分区...
-if exist "%SystemDrive%\Windows\Setup\xrsysextendc.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasysextendc.txt" (
     ECHO SELECT VOLUME=%%SystemDrive%% > "%SystemDrive%\diskpart.extend"
     ECHO EXTEND >> "%SystemDrive%\diskpart.extend"
     START /WAIT DISKPART /S "%SystemDrive%\diskpart.extend"
     DEL /f /q "%SystemDrive%\diskpart.extend"
 )
-if exist "%SystemDrive%\Windows\Setup\xrsysextendd.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasysextendd.txt" (
     ECHO SELECT VOLUME=D: > "%SystemDrive%\diskpart.extend"
     ECHO EXTEND >> "%SystemDrive%\diskpart.extend"
     START /WAIT DISKPART /S "%SystemDrive%\diskpart.extend"
@@ -117,12 +109,12 @@ if exist "%SystemDrive%\Windows\Setup\xrsysextendd.txt" (
 )
 
 if exist api1_bsq.bat call api1_bsq.bat
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\API\api1_bsq.bat" echo y | start "" /max /wait "%%a:\Xiaoran\API\api1_bsq.bat"
+        if exist "%%a:\PanDaTech\API\api1_bsq.bat" echo y | start "" /max /wait "%%a:\PanDaTech\API\api1_bsq.bat"
     )
 )
-echo [API]正在等待windeploy进入下一个阶段...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [API]正在等待 windeploy 进入下一个阶段...>"%systemdrive%\Windows\Setup\wallname.txt"
 goto end
 
 :bsz
@@ -132,38 +124,23 @@ if exist fonts.exe (
     echo [API]正在应用常用字体包...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait fonts.exe /S
 )
-@rem if not exist "%SystemDrive%\WINDOWS\Setup\xrsysnoruntime.txt" (
-@rem     if exist "osc\runtime\MSVBCRT.AIO.exe" (
-@rem         echo [API]正在应用VC运行库 by Dreamcast...>"%systemdrive%\Windows\Setup\wallname.txt"
-@rem         start "" /wait "osc\runtime\MSVBCRT.AIO.exe" /SILENT /SUPPRESSMSGBOXES /NOCLOSEAPPLICATIONS /NORESTARTAPPLICATIONS /NORESTART /COMPONENTS="vbvc567,vc2005,vc2008,vc2010,vc2012,vc2013,vc2019,vc2022,uc10,vstor"
-@rem     )
-@rem     if %osver% GEQ 2 (
-@rem         if exist "osc\runtime\VisualCppRedist_AIO.exe" (
-@rem             echo [API]正在应用VC运行库 by abodi1406...>"%systemdrive%\Windows\Setup\wallname.txt"
-@rem             start "" /wait "osc\runtime\VisualCppRedist_AIO.exe" /ai
-@rem         )
-@rem         if exist "osc\runtime\VC.exe" (
-@rem             echo [API]正在应用VC运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
-@rem             start "" /wait "osc\runtime\VC.exe" /S
-@rem         )
-@rem     )
-@rem )
+
 ::应用系统驱动
-if exist xrsysdrv.zip (
-    echo [API]正在解压驱动zip...>"%systemdrive%\Windows\Setup\wallname.txt"
-    echo %zip% e -r -y xrsysdrv.zip >>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
-    %zip% e -r -y xrsysdrv.zip
+if exist pandasysdrv.zip (
+    echo [API]正在解压驱动.zip...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo %zip% e -r -y pandadrv.zip >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
+    %zip% e -r -y pandadrv.zip
     del /f /q wandrv.iso
 )
 rem ARM64 不支持挂载，需要解压
 if exist wandrv.iso if /i "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
-    echo [API]正在解压驱动iso...>"%systemdrive%\Windows\Setup\wallname.txt"
-    echo %zip% e -r -y wandrv.iso >>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
-    %zip% e -r -y wandrv.iso >>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo [API]正在解压驱动.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo %zip% e -r -y wandrv.iso >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
+    %zip% e -r -y wandrv.iso >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
     del /f /q wandrv.iso
 )
 if %osver% GEQ 2 if exist CeoMSX.wim (
-    echo [API]正在应用CeoMSX...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在应用 CeoMSX...>"%systemdrive%\Windows\Setup\wallname.txt"
     mkdir CeoMSX
     DISM.exe /Mount-Wim /WimFile:CeoMSX.wim /index:1 /MountDir:CeoMSX
     if "%PROCESSOR_ARCHITECTURE%"=="AMD64" if exist "%CD%\CeoMSX\CeoMSXx64.exe" start "" /wait "%CD%\CeoMSX\CeoMSXx64.exe" /%systemdrive%
@@ -174,21 +151,21 @@ if %osver% GEQ 2 if exist CeoMSX.wim (
 if exist "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe" (
     echo [API]正在应用驱动总裁...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe"
-    echo %SystemDrive%\WINDOWS\WinDrive\DcLoader.exe>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\WINDOWS\WinDrive\DcLoader.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 ) else if exist "%SystemDrive%\WINDOWS\WinDrive\SDI*.exe" (
     for %%a in ("%SystemDrive%\WINDOWS\WinDrive\SDI*.exe") do (
         if /i "PROCESSOR_ARCHITECTURE"=="AMD64" (
             echo %%~na | find /i "64" && (
-                echo [API]正在应用Snappy Driver Installer x64...>"%systemdrive%\Windows\Setup\wallname.txt"
-                echo %%a>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
-                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex >>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+                echo [API]正在应用 Snappy Driver Installer x64...>"%systemdrive%\Windows\Setup\wallname.txt"
+                echo %%a>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
+                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
             )
         )
         if /i "PROCESSOR_ARCHITECTURE"=="x86" (
             echo %%~na | find /i "64" || (
-                echo [API]正在应用Snappy Driver Installer x86...>"%systemdrive%\Windows\Setup\wallname.txt"
-                echo %%a>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
-                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex >>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+                echo [API]正在应用 Snappy Driver Installer x86...>"%systemdrive%\Windows\Setup\wallname.txt"
+                echo %%a>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
+                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
             )
         )  
     )
@@ -196,59 +173,59 @@ if exist "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe" (
     echo [API]正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\WINDOWS\WinDrive\*.ini>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\WINDOWS\WinDrive\*.ini>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 ) else if exist "%SystemDrive%\Sysprep\Drivers\*.ini" (
     echo [API]正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\Drivers\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\Sysprep\Drivers\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\Drivers\*.ini>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\Sysprep\Drivers\*.ini>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 ) else if exist "%SystemDrive%\Sysprep\drvceo.ini" (
     echo [API]正在应用驱动总裁...>"%systemdrive%\Windows\Setup\wallname.txt"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\drvceo.ini>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\Sysprep\drvceo.ini>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 ) else if exist "%SystemDrive%\Sysprep\wandr*.exe" (
     echo [API]正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
     for %%a in (%SystemDrive%\Sysprep\wandr*.exe) do move /y "%%a" "%%~dpawandrv.exe"
     for %%a in (%SystemDrive%\Sysprep\wandr*.ini) do move /y "%%a" "%%~dpawandrv.ini"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\wandr*.exe>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\Sysprep\wandr*.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 ) else if exist "%SystemDrive%\Sysprep\*wandrv6.exe" (
     echo [API]正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
     for %%a in (%SystemDrive%\Sysprep\*wandrv6.exe) do move /y "%%a" "%%~dpawandrv.exe"
     for %%a in (%SystemDrive%\Sysprep\*wandrv6.ini) do move /y "%%a" "%%~dpawandrv.ini"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\*wandrv6.exe>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\Sysprep\*wandrv6.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 ) else if exist "%SystemDrive%\Sysprep\easydr*.exe" (
     echo [API]正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\easydr*.exe>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\Sysprep\easydr*.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 ) else if exist "%SystemDrive%\wandrv\wandrv.exe" (
     echo [API]正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\wandrv\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\wandrv\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\wandrv\wandrv.exe>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo %SystemDrive%\wandrv\wandrv.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 )
 if exist wandrv.iso (
-    echo [API]正在应用万能驱动wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在应用万能驱动 wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
     rd /s /q "%SystemDrive%\WINDOWS\WinDrive\"
     md wandrv
     move /y "%~dp0wandrv.iso" "%~dp0wandrv\wandrv.iso"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv\DriveCleaner.exe"
     start "" /wait "%~dp0wandrv\DriveCleaner.exe" /wandrv
-    echo wandrv.iso>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo wandrv.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
     del /f /q "%~dp0wandrv\wandrv.iso"
 )
 if exist wandrv2.iso (
-    echo [API]正在应用万能驱动wandrv2.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在应用万能驱动 wandrv2.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
     md wandrv2
     move /y "%~dp0wandrv2.iso" "%~dp0wandrv2\wandrv.iso"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv2\DriveCleaner.exe"
     start "" /wait "%~dp0wandrv2\DriveCleaner.exe" /wandrv
-    echo wandrv2.iso>>"%systemdrive%\Windows\Setup\xrsysdriverdebug.log"
+    echo wandrv2.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
     del /f /q "%~dp0wandrv\wandrv.iso"
 )
 
@@ -261,43 +238,43 @@ del /f /s /q "%SystemDrive%\Sysprep\*.7z"
 
 cd /d "%~dp0"
 for %%a in (InDeploy\*.exe) do (
-    echo [API]正在部署中应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在部署中应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%a" /S
     del /f /q "%%a"
 )
 for %%a in (InDeploy\*.msi) do (
-    echo [API]正在部署中应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在部署中应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%a" /passive /qb-! /norestart
     del /f /q "%%a"
 )
 for %%a in (InDeploy\*.reg) do (
-    echo [API]正在部署中应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在部署中应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     regedit /s "%%a"
     del /f /q "%%a"
 )
 cd /d "%~dp0"
 if exist api2_bsz.bat (
-    echo [API]正在应用DIY接口api2_bsz.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在应用 DIY 接口 api2_bsz.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
     call api2_bsz.bat
 )
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\API\api2_bsz.bat" (
-            echo [API]正在应用DIY接口%%a:\~\api2_bsz.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
-            echo y | start "" /max /wait "%%a:\Xiaoran\API\api2_bsz.bat"
+        if exist "%%a:\PanDaTech\API\api2_bsz.bat" (
+            echo [API]正在应用DIY接口 %%a:\~\api2_bsz.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+            echo y | start "" /max /wait "%%a:\PanDaTech\API\api2_bsz.bat"
         )
-        for %%b in (%%a:\Xiaoran\API\InDeploy\*.exe) do (
-            echo [API]正在部署中应用%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\API\InDeploy\*.exe) do (
+            echo [API]正在部署中应用 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /S
             del /f /q "%%b"
         )
-        for %%b in (%%a:\Xiaoran\API\InDeploy\*.msi) do (
-            echo [API]正在部署中应用%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\API\InDeploy\*.msi) do (
+            echo [API]正在部署中应用 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /passive /qb-! /norestart
             del /f /q "%%b"
         )
-        for %%b in (%%a:\Xiaoran\API\InDeploy\*.reg) do (
-            echo [API]正在部署中应用%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\API\InDeploy\*.reg) do (
+            echo [API]正在部署中应用 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             regedit /s "%%b"
             del /f /q "%%b"
         )
@@ -308,7 +285,7 @@ goto end
 :bsh
 title 部署后系统处理（请勿关闭此窗口）
 echo [API]正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
-echo 禁止win10大版本系统更新
+echo 禁止 Win10 大版本系统更新
 ver | find "10.0." && (
     reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v TargetReleaseVersion /t REG_DWORD /d 1 /f
     for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v DisplayVersion') do (
@@ -316,24 +293,24 @@ ver | find "10.0." && (
     )
 )
 ver | find "10.0.1" && reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v ProductVersion /t REG_SZ /d "Windows 10" /f
-ver | find "10.0.16" && echo 1>"%systemdrive%\Windows\Setup\xrsysnowu.txt"
-ver | find "10.0.15" && echo 1>"%systemdrive%\Windows\Setup\xrsysnowu.txt"
-ver | find "10.0.14" && echo 1>"%systemdrive%\Windows\Setup\xrsysnowu.txt"
-ver | find "10.0.10" && echo 1>"%systemdrive%\Windows\Setup\xrsysnowu.txt"
+ver | find "10.0.16" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
+ver | find "10.0.15" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
+ver | find "10.0.14" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
+ver | find "10.0.10" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 if %osver% LEQ 3 if %osver% GEQ 2 echo y | start "" /min /wait "%~dp0apifiles\EOSNotify.bat"
 if %osver% GEQ 3 (
-    echo win8-11系统WD、WU驱动处理
+    echo Win8-11 系统 WD、WU 驱动处理
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
     start "" /wait /min "%~dp0apifiles\Wub.exe" /D /P
-    echo 关闭VBS基于虚拟化的安全性
+    echo 关闭 VBS 基于虚拟化的安全性
     bcdedit /set hypervisorlaunchtype off
     echo 关闭显示首次登录动画
     reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f
-    echo 禁用BitLocker自动加密
+    echo 禁用 BitLocker 自动加密
     reg add "HKLM\SYSTEM\CurrentControlSet\BitLocker" /v "PreventDeviceEncryption" /t REG_DWORD /d 1 /f
 )
 if %osver% GEQ 2 (
@@ -351,12 +328,12 @@ echo 创建用户
 if exist "%SystemDrive%\Users\Default\NTUSER.DAT" (
     echo y | start "" /wait /min "%~dp0apifiles\newuser.bat"
 )
-echo [API]正在应用DIY接口api3_bsh.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [API]正在应用DIY接口 api3_bsh.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist api3_bsh.bat call api3_bsh.bat
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\API\api3_bsh.bat" (
-            echo y | start "" /max /wait "%%a:\Xiaoran\API\api3_bsh.bat"
+        if exist "%%a:\PanDaTech\API\api3_bsh.bat" (
+            echo y | start "" /max /wait "%%a:\PanDaTech\API\api3_bsh.bat"
         )
     )
 )
@@ -368,10 +345,9 @@ goto end
 
 :dls
 title 登录时系统处理（请勿关闭此窗口）
-rem start "" /min "%~dp0apifiles\DelDrvCeo.bat"
 taskkill /f /im explorer.exe
 if %osver% GEQ 3 (
-    echo win8-11系统WD、WU驱动处理
+    echo Win8-11 系统 WD、WU 驱动处理
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
@@ -387,32 +363,32 @@ if %osver% GEQ 3 (
 )
 echo Login
 for %%a in (Login\*.exe) do (
-    echo [API]正在登录时应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在登录时应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%a" /S
     del /f /q "%%a"
 )
 for %%a in (Login\*.msi) do (
-    echo [API]正在登录时应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在登录时应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%a" /passive /qb-! /norestart
     del /f /q "%%a"
 )
 for %%a in (Login\*.reg) do (
-    echo [API]正在登录时应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在登录时应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     regedit /s "%%a"
     del /f /q "%%a"
 )
 if exist api4_dls.bat call api4_dls.bat
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\API\api4_dls.bat" (
-            echo y | start "" /max /wait "%%a:\Xiaoran\API\api4_dls.bat"
+        if exist "%%a:\PanDaTech\API\api4_dls.bat" (
+            echo y | start "" /max /wait "%%a:\PanDaTech\API\api4_dls.bat"
         )
     )
 )
-reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v "XRSYSAPI"
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v "PanDaSysAPI"
 for /f "delims= " %%i in ('reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /t REG_EXPAND_SZ ^| find /i "Unattend"') do reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v %%i /f
 if exist "%SystemDrive%\Windows\OsConfig\osc.exe" copy /y "%SystemDrive%\Windows\OsConfig\osc.exe" "%SystemDrive%\Windows\Setup\Set\osc.exe"
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v "XRSYSAPI" /t REG_SZ /d "%~dp0osc.exe /S /5"
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v "PanDaSysAPI" /t REG_SZ /d "%~dp0osc.exe /S /5"
 shutdown -r -t 0
 goto end
 
@@ -435,7 +411,6 @@ if %osver% GEQ 4 (
     taskkill /f /im MicrosoftEdgeUpdate.exe
     taskkill /f /im onedrive.exe
     taskkill /f /im onedrivesetup.exe
-    rem del /f /s /q "%USERPROFILE%\Desktop\Microsoft Edge.lnk"
 )
 echo 修复双用户问题
 if /i not "%USERNAME%"=="Administrator" (
@@ -460,67 +435,57 @@ if %osver% GEQ 2 (
     bcdedit /timeout 3
 )
 
-if %osver% GEQ 3 (
-    @REM reagentc /enable
-    @REM netsh advfirewall set allprofiles state off
-    @REM bcdedit /set {current} bootmenupolicy legacy
-    @REM bcdedit /set {current} bootmenupolicy standard
-)
-
-
 echo 删除残留的系统启动项
-reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v "XRSYSAPI"
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v "PanDaSysAPI"
 for /f "delims= " %%i in ('reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /t REG_EXPAND_SZ ^| find /i "Unattend"') do reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v %%i /f
 del /f /q "%SystemDrive%\Windows\System32\deploy.exe"
+
 echo 删除装机助理残留
 del /q /f "%SystemDrive%\Users\Public\Desktop\Internet Explorer.lnk"
 del /q /f "%SystemDrive%\Users\Public\Desktop\网址导航.lnk"
-echo 潇然系统盗版提示
-reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v legalnoticecaption /t REG_SZ /d "警告：您的系统可能没有部署完整（API）" /f
-reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v legalnoticetext /t REG_SZ /d "这通常是网络连接不稳定或部署程序BUG导致的，请在点击【确定】登录账户后，访问http://url.xrgzs.top/osc下载、重新运行osc.exe尝试解决。此提示每次登录前都会强制弹出，如有特殊情况请访问https://sys.xrgzs.top/faq/error.html#legal-notice解决。" /f
 
 cd /d "%~dp0"
 echo Run
 for %%a in (Run\*.exe) do (
-    echo [API]正在桌面环境下应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在桌面环境下应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%a" /S
     del /f /q "%%a"
 )
 for %%a in (Run\*.msi) do (
-    echo [API]正在桌面环境下应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在桌面环境下应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%a" /passive /qb-! /norestart
     del /f /q "%%a"
 )
 for %%a in (Run\*.reg) do (
-    echo [API]正在桌面环境下应用%%a...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [API]正在桌面环境下应用 %%a...>"%systemdrive%\Windows\Setup\wallname.txt"
     regedit /s "%%a"
     del /f /q "%%a"
 )
-echo [API]正在应用DIY接口api5_jzm.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [API]正在应用 DIY 接口 api5_jzm.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist api5_jzm.bat call api5_jzm.bat
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
-        if exist "%%a:\Xiaoran\API\api5_jzm.bat" (
-            echo y | start "" /max /wait "%%a:\Xiaoran\API\api5_jzm.bat"
+        if exist "%%a:\PanDaTech\API\api5_jzm.bat" (
+            echo y | start "" /max /wait "%%a:\PanDaTech\API\api5_jzm.bat"
         )
-        for %%b in (%%a:\Xiaoran\API\Run\*.exe) do (
-            echo [API]正在桌面环境下应用%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\API\Run\*.exe) do (
+            echo [API]正在桌面环境下应用 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /S
             del /f /q "%%b"
         )
-        for %%b in (%%a:\Xiaoran\API\Run\*.msi) do (
-            echo [API]正在桌面环境下应用%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\API\Run\*.msi) do (
+            echo [API]正在桌面环境下应用 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /passive /qb-! /norestart
             del /f /q "%%b"
         )
-        for %%b in (%%a:\Xiaoran\API\Run\*.reg) do (
-            echo [API]正在桌面环境下应用%%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+        for %%b in (%%a:\PanDaTech\API\Run\*.reg) do (
+            echo [API]正在桌面环境下应用 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             regedit /s "%%b"
             del /f /q "%%b"
         )
     )
 )
-echo [API]正在应用OSC系统优化组件...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [API]正在应用 OSC 系统优化组件...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "%~dp0osc.exe" (
     start "" /wait "%~dp0osc.exe" /S
 )
@@ -534,7 +499,7 @@ if not exist "%SystemDrive%\Windows\Setup\oscstate.txt" (
 echo [API]正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
 
 if %osver% GEQ 3 (
-    echo win8-11系统WU驱动处理
+    echo Win8-11 系统 WU 驱动处理
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-enable.reg"
 )
 
