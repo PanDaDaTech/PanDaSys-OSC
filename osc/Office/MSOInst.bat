@@ -18,7 +18,7 @@ if not "%1"=="" if exist "%1" (
   if not "%2"=="" (
     set "officeisoread=%2"
   ) else (
-    set "errorreason=OfficeISO文件读取失败。"
+    set "errorreason=Office ISO 文件读取失败。"
     goto error
   )
   for %%i in (!officeisoread!) do (
@@ -34,7 +34,7 @@ if not "%1"=="" if exist "%1" (
 
 :readiso
 cls
-echo Office ISO文件信息读取
+echo Office ISO 文件信息读取
 for %%i in (*.iso.iso) do move /y "%%i" "%%~ni"
 for /r %%i in (Office_*.iso) do (
   set "officeiso=%%i"
@@ -47,7 +47,7 @@ for /r %%i in (Office_*.iso) do (
   )
 )
 if not exist "%officeiso%" (
-  set "errorreason=OfficeISO文件不存在。"
+  set "errorreason=Office ISO 文件不存在。"
   goto error
 )
 if "%officeverarch%"=="x64" set officeverarch=AMD64
@@ -78,11 +78,11 @@ if exist "%systemdrive%\Windows\SysWOW64\wscript.exe" (
 
 :findisomount
 cls
-echo OSFMount组件处理
+echo OSFMount 组件处理
 if not exist OSFMount.sys (
   if not exist OSFMount.com (
     if not exist OSFMount.exe (
-      set "errorreason=OSFMount组件不存在。"
+      set "errorreason=OSFMount 组件不存在。"
       goto error
     )
   )
@@ -108,28 +108,20 @@ cls
 echo 系统版本判断
 if %officevernum% GEQ 15 (
   if %osver% LEQ 1 (
-    set "errorreason=WinXP系统版本不支持。"
+    set "errorreason=WinXP 系统版本不支持。"
     goto error
   )
   if %officevernum% GEQ 16 (
     if %osver% LEQ 3 (
       if not "%officever%"=="2016" (
         if not "%officeforwin7%"=="yes" (
-          set "errorreason=系统版本不支持最新版本Office。"
+          set "errorreason=系统版本不支持最新版本 Office。"
           goto error
         )
       )
     )
   )
 )
-
-@rem :judgeifofficeinstalled
-@rem echo 检查是否已经安装Office2010，如果已经安装则退出脚本
-@rem reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Office\14.0" >nul 2>&1
-@rem if %errorlevel% == 0 (
-@rem   echo Office 2010 is already installed.
-@rem   exit /b
-@rem )
 
 :finddriveletter
 cls
@@ -145,17 +137,17 @@ goto error
 
 :mount
 cls
-echo 挂载Office ISO到指定的盘符
+echo 挂载 Office ISO 到指定的盘符
 "%TEMP%\OSFMount.com" -a -t file -m %mountdrive%: -f "%officeiso%"
 
 :install
 cls
-echo 运行Office Setup
+echo 运行 Office Setup
 if "%officevertype%"=="MSI" (
   if exist "%mountdrive%:\setup.exe" (
  "%mountdrive%:\setup.exe" /config "%~dp0config\%officever%_MSI.xml"
   ) else (
-    set "errorreason=未找到MSI安装程序。"
+    set "errorreason=未找到 MSI 安装程序。"
     goto error
   )
 ) else if "%officevertype%"=="C2R" (
@@ -164,20 +156,20 @@ if "%officevertype%"=="MSI" (
   ) else if exist "%mountdrive%:\setup.exe" (
     "%mountdrive%:\setup.exe" /configure "%~dp0config\%officever%_%officeverarch%.xml"
   ) else (
-    set "errorreason=未找到C2R安装程序。"
+    set "errorreason=未找到 C2R 安装程序。"
     goto error
   )
 )
 
 :unmount
 cls
-echo 卸载Office ISO
+echo 卸载 Office ISO
 "%TEMP%\OSFMount.com" -d -m %mountdrive%:
 del /f /q "%officeiso%"
 
 :pdfandxps
 cls
-echo 安装SaveAsPDFandXPS插件（Office 2007）
+echo 安装 SaveAsPDFandXPS 插件（Office 2007）
 if exist SaveAsPDFandXPS.exe start /wait SaveAsPDFandXPS.exe /quiet
 
 :createdesktoplnk
@@ -209,29 +201,29 @@ copy /y "%stmenupath%\Word.lnk" "%deskpath%\Word.lnk"
 :fixoffice2013
 cls
 if %officevernum% EQU 15 (
-  echo 删除Office2013 SkyDrive右键菜单
+  echo 删除 Office2013 SkyDrive 右键菜单
   reg delete "HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\SPFS.ContextMenu" /f
-  echo 跳过Office2013首次引导程序
+  echo 跳过 Office2013 首次引导程序
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\FirstRun" /f /v "BootedRTM" /t REG_DWORD /d 1
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\Common\General" /f /v "FirstRun" /t REG_DWORD /d 0
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\Common\General" /f /v "ShownFirstRunOptin" /t REG_DWORD /d 1
 )
 if %officevernum% EQU 16 (
-  echo 跳过Office2016首次引导程序
+  echo 跳过 Office2016 首次引导程序
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\General" /f /v "FirstRun" /t REG_DWORD /d 0
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\General" /f /v "ShownFirstRunOptin" /t REG_DWORD /d 1
 )
 :fixarialfont
 cls
 if %officevernum% LEQ 15 (
-  echo 解决Office2016以下版本中文未知字体难看的问题
+  echo 解决 Office2016 以下版本中文未知字体难看的问题
   reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" /f /v "Arial Unicode MS (TrueType)"
   del /f /q "%SystemDrive%\Windows\Fonts\ARIALUNI.TTF"
 )
 
 :activeoffice
 cls
-echo 使用KMS激活Office
+echo 使用 KMS 激活 Office
 if %officevernum% GEQ 14 (
   if exist "%systemdrive%\Program Files\Microsoft Office\Office%officevernum%\OSPP.VBS" (
       set "officepath=%systemdrive%\Program Files\Microsoft Office\Office%officevernum%"
@@ -240,7 +232,7 @@ if %officevernum% GEQ 14 (
   )
   cd /d "!officepath!"
   if "%officever%"=="365" (
-    echo Office 365转MondoVL
+    echo Office 365 转 MondoVL
     cscript //Nologo ospp.vbs /inslic:"..\root\Licenses16\MondoVL_KMS_Client-ppd.xrm-ms"
     cscript //Nologo ospp.vbs /inslic:"..\root\Licenses16\MondoVL_KMS_Client-ul-oob.xrm-ms"
     cscript //Nologo ospp.vbs /inslic:"..\root\Licenses16\MondoVL_KMS_Client-ul.xrm-ms"
@@ -248,7 +240,7 @@ if %officevernum% GEQ 14 (
     cscript //Nologo ospp.vbs /inslic:"..\root\Licenses16\MondoVL_MAK-ppd.xrm-ms"
     cscript //Nologo ospp.vbs /inslic:"..\root\Licenses16\MondoVL_MAK-ul-phn.xrm-ms"
     cscript //Nologo ospp.vbs /inpkey:HFTND-W9MK4-8B7MJ-B6C4G-XQBR2
-    echo 正在处理KMS激活Office的盗版弹窗问题...
+    echo 正在处理 KMS 激活 Office 的盗版弹窗问题...
     if exist "%SystemDrive%\Windows\System32\wbem\WMIC.exe" (
       for /f "tokens=2 delims==" %%G in ('"wmic path SoftwareLicensingProduct where (ApplicationID='0ff1ce15-a989-479d-af46-f275c6370663' and Description like '%%KMSCLIENT%%' and not Description like '%%Office 15%%' and PartialProductKey is not NULL) get ID /VALUE" 2^>nul') do (if defined SKUID (call set "SKUID=!SKUID! %%G") else (call set "SKUID=%%G"))
     ) else (
@@ -276,8 +268,6 @@ echo Office 安装完成
 
 :selfdelete
 taskkill /f /im OfficeC2RClient.exe
-@rem rd /s /q "%~dp0"
-@rem del /f /q %0
 exit /b
 
 :error
