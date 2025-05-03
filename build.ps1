@@ -100,9 +100,6 @@ if (-not (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe")) {
     Write-Host "Cannot find nsis!"
     exit 1
 }
-if (Test-Path 'osc\xrsoft.exe') {
-    Write-Host "xrsoft.exe already exists."
-}
 else {
     # 下载所需文件
     Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/irdVI27gi2pg" -OutFile "osc\runtime\DirectX_Redist_Repack_x86_x64_Final.exe"
@@ -113,8 +110,7 @@ else {
     Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/ixdbP27giisf" -OutFile "osc\xrsoft.exe"
 
     # 下载其他文件
-    Invoke-WebRequest -Uri "https://url.xrgzs.top/osconline" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
-    Invoke-WebRequest -Uri "https://url.xrgzs.top/oscsoft" -OutFile "osc\oscsoftof.txt" -ErrorAction Stop
+    Invoke-WebRequest -Uri "https://down.pandadatech.cn/d/Config/osc/osconline.bat" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
 }
 
 # 构建
