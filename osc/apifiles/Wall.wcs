@@ -1,6 +1,7 @@
 ﻿// ===============================================================================
-//                           潇然系统部署背景插件 PECMD 版
+//                           PanDaSys 部署背景插件 PECMD 版
 // ===============================================================================
+//  
 
 // 获取分辨率
 SCRN ScrW,ScrH
@@ -16,8 +17,7 @@ IFEX ! "wall.jpg" ,FILE "%SystemDrive%\Windows\Web\Wallpaper\Windows\img0.jpg"=>
 // 主窗口，启动！
 CALL WIN1
 
-_SUB WIN1,L0T0W%ScrW%H%ScrH%,潇然系统部署背景插件,,imageres.dll#22,#,,-ntab -nfocus -na -trap
-    // ENVI @this.Enable=0
+_SUB WIN1,L0T0W%ScrW%H%ScrH%,PanDaSys 部署背景插件,,imageres.dll#22,#,,-ntab -nfocus -na -trap
     ENVI @this.Font=12:微软雅黑
     CALL DRAW
     TIME ,3000,CALL 任务栏监控
@@ -43,11 +43,6 @@ _SUB DRAW
     // 任务副标题
     ENVI @LABE2.*del=
     LABE -center -trans LABE2,L0T80W%ScrW%H30,%Name%,,0xffffff,14,
-
-    
-    // 进度条
-    // CALC 进度条上=%ScrH%-16
-    // PBAR ,L0T%进度条上%W%ScrW%H16,75,
     
     CALL SYSINFO
     // 读取镜像状态
@@ -61,11 +56,10 @@ _SUB DRAW
         FIND explorer.exe,CALL WBTN
     }
     // PE调试时显示最小化按钮
-    IFEX x:\Windows\Xiaoran.ico,CALL WBTN
+    IFEX x:\Windows\PanDaPE\Icon\X.ico,CALL WBTN
     // 副标题显示镜像信息
-    READ "%SystemDrive%\Windows\Version.txt",1,XRSYSVER
-    IFEX ! |%XRSYSVER%=,ENVI @LABE2=%XRSYSVER%
-    
+    READ "%SystemDrive%\Windows\Version.txt",1,SYSVER
+    IFEX ! |%SYSVER%=,ENVI @LABE2=%SYSVER%
 
 _END
 
@@ -88,21 +82,11 @@ _SUB WBTN
 _END
 
 _SUB WBTN_trans
-
-    // 删除图片
-    // ENVI @BKG.Visible=0
     
     ENVI 任务栏=开
     CALL 显示任务栏
     
-    // 隐藏窗口 ENVI @WIN1.Visable=:0
-    // 最小化窗口
     ENVI @WIN1.Visable=*4
-    
-    // 恢复隐藏按钮
-    // CALC 隐=%ScrW%-51
-    // ENVI @隐.*del=
-    // LABE -center -vcenter 隐,L%隐%T1W50H30,■,CALL WBTN,0xffffff#0xf0f0f0##0xd2d2d2,16:宋体
 _END
 
 _SUB SYSINFO
@@ -129,15 +113,7 @@ _SUB SYSINFO
     // 信息区域
     CALC 信息左=48
     CALC 信息条左=%信息左%+80
-    // CALC 信息上=0
-    CALC 信息上=%ScrH%-42-390
-
-    REGI .HKLM\SYSTEM\ControlSet001\Control\ComputerName\ComputerName\ComputerName,计算机名
-    LABE -left -trans 计算机名L,L%信息左%T%信息上%W500H30,计算机名：%计算机名%,,0xffffff,12
-    CALC 信息上=%信息上%+30
-        
-    LABE -left -trans 当前用户L,L%信息左%T%信息上%W500H30,当前用户：%USERNAME%,,0xffffff,12
-    CALC 信息上=%信息上%+30
+    CALC 信息上=%ScrH%-42-200
     
     REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName,产品名称
     REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\DisplayVersion,显示版本
@@ -157,45 +133,25 @@ _SUB SYSINFO
     CALC 信息上=%信息上%+30
 
     REGI .HKLM\HARDWARE\DESCRIPTION\System\CentralProcessor\0\ProcessorNameString,处理器
-    LABE -left -trans ,L%信息左%T%信息上%W500H30,处理器　：%处理器%,CALC -gui,0xffffff,12
-    CALC 信息上=%信息上%+30
-    ENVI CPUS=1
-    FIND --pid TMS,
-    MSTR I1,T1,CPUS=<1*>%TMS%
-    PBAR 处理器情况P,L%信息条左%T%信息上%W250H15,50
-    CALC 信息上=%信息上%+30
-
-    TEAM FIND MEM=?,总内存|CALC 内存=%总内存%/1024#2
-    LABE -left -trans 内存情况L,L%信息左%T%信息上%W500H30,运行内存：%内存% GB,KILL -gui,0xffffff,12
-    CALC 信息上=%信息上%+30
-    PBAR 内存情况P,L%信息条左%T%信息上%W250H15,50
+    LABE -left -trans ,L%信息左%T%信息上%W500H30,处理器：%处理器%,CALC -gui,0xffffff,12
     CALC 信息上=%信息上%+30
     
-    TEAM FIND %SystemDrive%\=?,系统盘|CALC 系统盘=%系统盘%/1024^3#2
-    LABE -left -trans 系统盘情况L,L%信息左%T%信息上%W500H30,系统分区：%系统盘% GB,,0xffffff,12
-    CALC 信息上=%信息上%+30
-    PBAR 系统盘情况P,L%信息条左%T%信息上%W250H15,50
+    TEAM FIND MEM=?,总内存|CALC 内存=%总内存%/1024#2
+    LABE -left -trans 内存情况L,L%信息左%T%信息上%W500H30,内存：%内存% GB,KILL -gui,0xffffff,12
     CALC 信息上=%信息上%+30
     
     REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardManufacturer,主板厂商
+        REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardProduct,主板型号
     IFEX ! |%主板厂商%=,
     {
-        LABE -left -trans ,L%信息左%T%信息上%W500H30,主板厂商：%主板厂商%,,0xffffff,12
+        LABE -left -trans ,L%信息左%T%信息上%W500H30,主板：%主板厂商% %主板型号%,,0xffffff,12
         CALC 信息上=%信息上%+30
     }
-    
-    REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardProduct,主板型号
-    IFEX ! |%主板型号%=,
-    {
-        LABE -left -trans ,L%信息左%T%信息上%W500H30,主板型号：%主板型号%,,0xffffff,12
-        CALC 信息上=%信息上%+30
-    }
-    
+
     READ Version.txt,1,OSCVER
     LABE -left -trans ,L%信息左%T%信息上%W500H30,程序版本：%OSCVER%,,0xffffff,12
     CALC 信息上=%信息上%+30
 
-    // LABE -left -trans ,L10T10W500H30,计算最终高度：%信息上%,,0xffffff,12
 _END
 
 _SUB 刷新分辨率
@@ -223,36 +179,14 @@ _SUB 刷新标题
 _END
 
 _SUB 刷新检测
-    REGI .HKLM\SYSTEM\ControlSet001\Control\ComputerName\ComputerName\ComputerName,计算机名
-    ENVI 计算机名L1=计算机名：%计算机名%
-    IFEX ! |%计算机名L%=%计算机名L1%,ENVI @计算机名L=%计算机名L1%
-
-	FIND --pid TMS,
-	MSTR I2,T2=<1*>%TMS%
-	CALC #I21=%I2%-%I1%
-	CALC #T21=%T2%-%T1%
-	CALC P=100-100*%I21%/%T21%/%CPUS%##1
-	IFEX |%P%=-0.0,ENVI P=0
-    ENVI @处理器情况P=%P%% %P%%
-
     IFEX MEM=?,可用内存
 	CALC 已用内存=(%总内存%-%可用内存%)/1024#2
-    ENVI 内存情况L1=运行内存：%已用内存% GB (已用) / %内存% GB (总)
+    ENVI 内存情况L1=内存：%内存% GB (总) / %已用内存% GB (已用)
     IFEX ! |%内存情况L%=%内存情况L1%,
     {
         ENVI @内存情况L=%内存情况L1%
 	    CALC 内存百分比=100-%可用内存%/%总内存%*100#0
 	    ENVI @内存情况P=%内存百分比%% %内存百分比%%
-    }
-
-    TEAM IFEX %SystemDrive%\=?,系统盘可用|CALC 系统盘可用=%系统盘可用%/1024^3#2
-    CALC 系统盘已用=(%系统盘%-%系统盘可用%)#2
-    ENVI 系统盘情况L1=系统分区：%系统盘已用% GB (已用) / %系统盘% GB (总)
-    IFEX ! |%系统盘情况L%=%系统盘情况L1%,
-    {
-        ENVI @系统盘情况L=%系统盘情况L1%
-        CALC 系统盘百分比=100-%系统盘可用%/%系统盘%*100#0
-        ENVI @系统盘情况P=%系统盘百分比%% %系统盘百分比%%
     }
 _END
 
@@ -268,10 +202,7 @@ _SUB 隐藏任务栏
     FIND --class:FirstUXWndClass --wid* &FUXWID,
     IFEX |%&FUXWID%<>0,
     {
-        // FIND --wid*@%&FUXWID% &FUXWS
-        // MSTR FUXT=<8>%&FUXWS%
         ENVI @@visible=%&FUXWID%:0
-        // IFEX |%LABE2%<>%FUXT%,ENVI @LABE2=%FUXT%
     }
 _END
 

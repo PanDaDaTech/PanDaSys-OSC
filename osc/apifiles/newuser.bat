@@ -17,21 +17,21 @@ for /l %%a in (1 1 4) do (
 )
 
 rem preset pcname
-if exist "%SystemDrive%\Windows\Setup\xrsyspcname.txt" (
-    set /p pcname=<"%SystemDrive%\Windows\Setup\xrsyspcname.txt"
+if exist "%SystemDrive%\Windows\Setup\pandasyspcname.txt" (
+    set /p pcname=<"%SystemDrive%\Windows\Setup\pandasyspcname.txt"
 ) else (
     set pcname=PC-%date:~0,4%%date:~5,2%%date:~8,2%%random_letters%
 )
 
 :getspoem
 rem support oem special
-if exist "%SystemDrive%\Windows\Setup\xrsysadmin.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasysadmin.txt" (
     set name=Administrator
-    del /f /q "%SystemDrive%\Windows\Setup\xrsysnewuser.txt"
+    del /f /q "%SystemDrive%\Windows\Setup\pandasysnewuser.txt"
     goto findok
-) else if exist "%SystemDrive%\Windows\Setup\xrsysnewuser.txt" ( 
-    set /P name=<"%SystemDrive%\Windows\Setup\xrsysnewuser.txt"
-    del /f /q "%SystemDrive%\Windows\Setup\xrsysadmin.txt"
+) else if exist "%SystemDrive%\Windows\Setup\pandasysnewuser.txt" ( 
+    set /P name=<"%SystemDrive%\Windows\Setup\pandasysnewuser.txt"
+    del /f /q "%SystemDrive%\Windows\Setup\pandasysadmin.txt"
     goto findok
 )
 
@@ -120,31 +120,30 @@ goto findok
 :oobe
 @REM if exist "%systemdrive%\Windows\System32\osk.exe" start osk.exe
 rem ask pcname
-if not exist "%SystemDrive%\Windows\Setup\xrsyspcname.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "OOBE - 机器名设置" "$input" "请输入您要设置的机器名：^^ - 机器名请勿包含中文/空格；^^ - 目前没有防呆机制，输错后果自负 ^^ - 15s内未做出反应则保持默认" "%pcname%" /screen /FS^=12 /length:24 /timeout^=15s') do set "pcnameinput=%%a"
+if not exist "%SystemDrive%\Windows\Setup\pandasyspcname.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "OOBE - 机器名设置" "$input" "请输入您要设置的机器名：^^ - 机器名请勿包含中文/空格；^^ - 目前没有防呆机制，输错后果自负 ^^ - 15s内未做出反应则保持默认" "%pcname%" /screen /FS^=12 /length:24 /timeout^=15s') do set "pcnameinput=%%a"
 rem ask user
-if not exist "%SystemDrive%\Windows\Setup\xrsysnewuser.txt" if not exist "%SystemDrive%\Windows\Setup\xrsysadmin.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "OOBE - 用户创建" "$input" "请输入您要创建的用户名：^^ - 用户名请勿包含中文/标点/空格；^^ - 目前没有防呆机制，输错会导致系统安装失败 ^^ - 15s内未做出反应则保持默认" "%name%" /screen /FS^=12 /length:24 /timeout^=15') do set "nameinput=%%a"
+if not exist "%SystemDrive%\Windows\Setup\pandasysnewuser.txt" if not exist "%SystemDrive%\Windows\Setup\pandasysadmin.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "OOBE - 用户创建" "$input" "请输入您要创建的用户名：^^ - 用户名请勿包含中文/标点/空格；^^ - 目前没有防呆机制，输错会导致系统安装失败 ^^ - 15s内未做出反应则保持默认" "%name%" /screen /FS^=12 /length:24 /timeout^=15') do set "nameinput=%%a"
 rem ask passwd
-if not exist "%SystemDrive%\Windows\Setup\xrsyspasswd.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "OOBE - 用户密码设置" "$input" "请输入您要设置的密码：^^ - 密码请勿包含中文/空格；^^ - 目前没有防呆机制，输错后果自负 ^^ - 15s内未做出反应则保持默认" "" /screen /FS^=12 /length:255 /timeout^=15s') do set "passinput=%%a"
+if not exist "%SystemDrive%\Windows\Setup\pandasyspasswd.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "OOBE - 用户密码设置" "$input" "请输入您要设置的密码：^^ - 密码请勿包含中文/空格；^^ - 目前没有防呆机制，输错后果自负 ^^ - 15s内未做出反应则保持默认" "" /screen /FS^=12 /length:255 /timeout^=15s') do set "passinput=%%a"
 rem ask uac
-if not exist "%SystemDrive%\Windows\Setup\xrsysuac.txt" if exist Winput.exe (
+if not exist "%SystemDrive%\Windows\Setup\pandasysuac.txt" if exist Winput.exe (
     wbox.exe "OOBE - UAC 设置" "是否启用 UAC（用户账户控制）？^^启用UAC可避免手滑运行程序，^但可能会减缓运行速度，^并且不方便程序安装。^^ - 15s内未做出反应则保持默认" "保持关闭 -$- ;启用" /TM=15 /FS=12
     if "!errorlevel!"=="2" (
-        echo 1 >"%SystemDrive%\Windows\Setup\xrsysuac.txt"
+        echo 1 >"%SystemDrive%\Windows\Setup\pandasysuac.txt"
     )
 )
-@REM taskkill /f /im osk.exe
-rem write xrsyspasswd tag
-if defined passinput >"%SystemDrive%\Windows\Setup\xrsyspasswd.txt" echo %passinput%
+rem write pandasyspasswd tag
+if defined passinput >"%SystemDrive%\Windows\Setup\pandasyspasswd.txt" echo %passinput%
 rem clear passwd var
 set passinput=
 rem delete blank
 if defined nameinput set "name=%nameinput%"
 if defined pcnameinput set "pcname=%pcnameinput%"
 rem backup var
-if defined name >"%SystemDrive%\Windows\Setup\xrsysnewuser.txt" echo %name%
-if defined pcname >"%SystemDrive%\Windows\Setup\xrsyspcname.txt" echo %pcname%
+if defined name >"%SystemDrive%\Windows\Setup\pandasysnewuser.txt" echo %name%
+if defined pcname >"%SystemDrive%\Windows\Setup\pandasyspcname.txt" echo %pcname%
 rem detect rdp
-if exist "%SystemDrive%\Windows\Setup\xrsysrdp.txt" if not exist "%SystemDrive%\Windows\Setup\xrsyspasswd.txt" echo 1 >"%SystemDrive%\Windows\Setup\xrsyspasswd.txt"
+if exist "%SystemDrive%\Windows\Setup\pandasysrdp.txt" if not exist "%SystemDrive%\Windows\Setup\pandasyspasswd.txt" echo 1 >"%SystemDrive%\Windows\Setup\pandasyspasswd.txt"
 goto setname
 
 :setname
@@ -156,7 +155,7 @@ if not "%name%"=="Administrator" (
     NET LOCALGROUP Users %name% /ADD
 ) else (
     NET USER Administrator /ACTIVE:yes
-    echo isadmin >"%SystemDrive%\Windows\Setup\xrsysadmin.txt"
+    echo isadmin >"%SystemDrive%\Windows\Setup\pandasysadmin.txt"
 )
 rem user group config
 NET ACCOUNTS /MAXPWAGE:UNLIMITED
@@ -170,19 +169,6 @@ NET USERS %name% /LOGONPASSWORDCHG:NO
 NET LOCALGROUP Administrators %name% /ADD
 rem password no expiration
 NetUser.exe %name% /pwnexp:y
-
-@REM 不生效，unattend会强制覆盖
-@REM :setpcname
-@REM if defined pcname set "pcname=%pcname: =%"
-@REM wmic computersystem where "caption='%computername%'" call Rename name='%pcname%'
-@REM reg add "HKCU\Software\Microsoft\Windows\ShellNoRoam" /f /ve /t REG_SZ /d "%pcname%"
-@REM reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" /f /v "ComputerName" /t REG_SZ /d "%pcname%"
-@REM reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName" /f /v "ComputerName" /t REG_SZ /d "%pcname%"
-@REM reg add "HKLM\SYSTEM\CurrentControlSet\Services\Eventlog" /f /v "ComputerName" /t REG_SZ /d "%pcname%"
-@REM reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" /f /v "ComputerName" /t REG_SZ /d "%pcname%"
-@REM reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /f /v "NV Hostname" /t REG_SZ /d "%pcname%"
-@REM reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /f /v "Hostname" /t REG_SZ /d "%pcname%"
-@REM reg add "HKU\.DEFAULT\Software\Microsoft\Windows\ShellNoRoam" /f /ve /t REG_SZ /d "%pcname%"
 
 endlocal
 exit
