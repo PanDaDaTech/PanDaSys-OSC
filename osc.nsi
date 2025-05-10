@@ -99,7 +99,7 @@ VIAddVersionKey PrivateBuild "PanDaSys" ;个人内部版本说明
 VIAddVersionKey SpecialBuild "NSIS" ;特殊内部版本说明
 
 
-Section /o "-PanDaSys 部署接口-部署前" PanDaSysAPI1
+Section /o "-PanDaSys 部署接口 - 部署前" PanDaSysAPI1
   ${If} ${FileExists} "$INSTDIR\pandasysstepapifiles.flag"
     DetailPrint "APIFILES 已经解压，跳过此操作！"
   ${Else}
@@ -124,7 +124,7 @@ Section /o "-PanDaSys 部署接口-部署前" PanDaSysAPI1
   ${EndIf}
 SectionEnd
 
-Section /o "-PanDaSys 部署接口-部署中" PanDaSysAPI2
+Section /o "-PanDaSys 部署接口 - 部署中" PanDaSysAPI2
   ${If} ${FileExists} "$INSTDIR\pandasysstepapi2.flag"
     DetailPrint "API2 已经执行，跳过此操作！"
   ${Else}
@@ -132,13 +132,13 @@ Section /o "-PanDaSys 部署接口-部署中" PanDaSysAPI2
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行 API2..."
+	  DetailPrint "解压并执行 API2 ..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/2" SW_SHOWMINIMIZED
 	${EndIf}
 SectionEnd
 
-Section /o "-PanDaSys 部署接口-部署后" PanDaSysAPI3
+Section /o "-PanDaSys 部署接口 - 部署后" PanDaSysAPI3
   ${If} ${FileExists} "$INSTDIR\pandasysstepapi3.flag"
     DetailPrint "API3 已经执行，跳过此操作！"
   ${Else}
@@ -152,7 +152,7 @@ Section /o "-PanDaSys 部署接口-部署后" PanDaSysAPI3
 	${EndIf}
 SectionEnd
 
-Section /o "-PanDaSys 部署接口-登录时" PanDaSysAPI4
+Section /o "-PanDaSys 部署接口 - 登录时" PanDaSysAPI4
   ${If} ${FileExists} "$INSTDIR\pandasysstepapifiles.flag"
     DetailPrint "APIFILES 已经解压，跳过此操作！"
   ${Else}
@@ -171,13 +171,13 @@ Section /o "-PanDaSys 部署接口-登录时" PanDaSysAPI4
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行 API4..."
+	  DetailPrint "解压并执行 API4 ..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/4" SW_SHOWMINIMIZED
 	${EndIf}
 SectionEnd
 
-Section /o "-PanDaSys 部署接口-进桌面" PanDaSysAPI5
+Section /o "-PanDaSys 部署接口 - 进桌面" PanDaSysAPI5
   ${If} ${FileExists} "$INSTDIR\pandasysstepapi5.flag"
     DetailPrint "API5 已经执行，跳过此操作！"
   ${Else}
@@ -185,7 +185,7 @@ Section /o "-PanDaSys 部署接口-进桌面" PanDaSysAPI5
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行 API5..."
+	  DetailPrint "解压并执行API5..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/5" SW_HIDE
 	${EndIf}
@@ -216,7 +216,7 @@ SectionGroup "优化设置"
     FileOpen $0 "$WINDIR\Setup\pandasysfkwu.txt" w
     FileClose $0
   SectionEnd
-  Section /o "启用 UAC"
+  Section /o "启用UAC"
     DetailPrint "正在输出 TAG - pandasysuac..."
     FileOpen $0 "$WINDIR\Setup\pandasysuac.txt" w
     FileClose $0
@@ -226,13 +226,14 @@ SectionGroup "优化设置"
     FileOpen $0 "$WINDIR\Setup\pandasysnopcname.txt" w
     FileClose $0
   SectionEnd
+SectionGroupEnd
 
-Section "-潇然系统优化工具 For PanDaSys" XROSC
+Section "-潇然系统优化组件 For PanDaSys" XROSC
   SetOutPath "$INSTDIR\osc"
   SetOverwrite try
-  DetailPrint "解压相关OSC数据..."
+  DetailPrint "解压相关 OSC 数据..."
   File /r ".\osc\*.*"
-  DetailPrint "运行OSC主程序..."
+  DetailPrint "运行 OSC 主程序..."
   ${DisableX64FSRedirection}
   nsExec::ExecToLog "$INSTDIR\osc\osc.bat"
 SectionEnd
