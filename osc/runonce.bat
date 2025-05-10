@@ -1,4 +1,3 @@
-@rem %1(start /min cmd.exe /c %0 :& exit )
 powershell -window minimized -command "" >nul
 @echo off
 chcp 936 > nul
@@ -113,10 +112,6 @@ del /f /q "%SystemDrive%\Windows\reg.ini"
 del /f /q "%SystemDrive%\Windows\regini.ini"
 for /f "delims=" %%a in ('dir /b /a %systemdrive%\~EasyDrv.Temp.*') do rd /s /q "%systemdrive%\%%a"
 
- for %%a in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
-    attrib -s -h -r "%%a:\~WTDR.Pack_Temp" /D
-    rd /s /q "%%a:\~WTDR.Pack_Temp"
-)
 del /f /s /q "%SystemDrive%\Windows\Setup\Set\*"
 rd /s /q "%SystemDrive%\Windows\Setup\Set"
 del /f /q "%SystemDrive%\Windows\Panther\unattend.xml"

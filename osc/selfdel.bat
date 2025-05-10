@@ -87,7 +87,6 @@ del /f /q "%SystemDrive%\Windows\CxSoftQii.ini"
 rd /s /q "%SystemDrive%\Windows\OsConfig"
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v RunLoader
 reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run" /f /v RunLoader
-@rem rd /s /q "%SystemDrive%\Windows\Setup\Run"
 del /f /q "%SystemDrive%\Documents and Settings\All Users\桌面\优化系统.exe"
 del /f /q "%SystemDrive%\Users\Public\Desktop\优化系统.exe"
 del /f /q "%SystemDrive%\优化系统.exe"

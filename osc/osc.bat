@@ -1,7 +1,7 @@
 chcp 936 > nul
 setlocal EnableDelayedExpansion
 @echo off
-title 潇然系统优化组件 For PanDaSys XRSYS-OSC For PanDaSys
+title 潇然系统优化组件 For PanDaSys pandasys-OSC-For-PanDaSys
 cd /d "%~dp0"
 if exist "%systemdrive%\Windows\SysWOW64\wscript.exe" (
     set "PROCESSOR_ARCHITECTURE=AMD64"
@@ -49,7 +49,7 @@ if exist "%SystemDrive%\Windows\Setup\State\State.ini" (
 :checkenv_winpe
 echo 检测是否在 PE 系统中运行
 if /i "%SystemDrive%"=="x:" if exist "X:\Windows\System32\PECMD.EXE" (
-    echo 不支持在 PE 系统中运行
+    echo 不支持在PE系统中运行
     goto endoff
 )
 
@@ -84,7 +84,7 @@ if not exist "%SystemDrive%\Windows\Setup\Set\pandasysstepapi5.flag" (
 )
 
 :copytags
-echo 拷贝相关 TAG 文件
+echo 拷贝相关TAG文件
 mkdir "%SystemDrive%\Windows\Setup\"
 for %%a in (C D E F G H) do (
     move /y "%%a:\zjsoft*.txt" "%SystemDrive%\Windows\Setup"
@@ -280,7 +280,7 @@ if exist "%systemdrive%\Windows\Setup\pandasysfirewall.txt" (
 :configurerdp
 set rdpport=3389
 if exist "%systemdrive%\Windows\Setup\pandasysrdp.txt" (
-    echo 打开RDP
+    echo 打开 RDP
     set /p rdpportnew=<"%SystemDrive%\Windows\Setup\pandasysrdp.txt"
     if not "!rdpportnew: =!"=="" if !rdpportnew! GEQ 2 if !rdpportnew! LEQ 65535 set rdpport=!rdpportnew!
     netsh firewall set portopening protocol=ALL port=!rdpport: =! name=RDP mode=ENABLE scope=ALL profile=ALL
@@ -300,13 +300,19 @@ echo 应用运行库
 if exist "runtime\runtime.bat" echo y | start "" /wait /min "runtime\runtime.bat"
 
 :oscapis
-echo 应用OSCAPI
+echo 应用 OSCAPI
+if exist "%SystemDrive%\Windows\Setup\zjsoftxrsoftno.txt" (
+    del /f /q "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe"
+)
+if exist "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe" (
+    start "" "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe" /S
+)
 if exist "%SystemDrive%\Windows\Setup\Set\osc\Office\Office_*.iso" (
-    echo [OSC]正在应用 OfficeISO...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用 Office-ISO...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /min /wait cmd /c "%SystemDrive%\Windows\Setup\Set\osc\Office\MSOInst.bat"
 )
 if exist "%SystemDrive%\Windows\Setup\Run\1\api1.bat" (
-    echo [OSC]正在应用DIY接口 api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用 DIY 接口 api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /max /wait "%SystemDrive%\Windows\Setup\Run\1\api1.bat"
 )
 for %%b in (%SystemDrive%\Windows\Setup\Run\1\*.exe) do (
@@ -349,7 +355,7 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 )
 
 :xrkms
-echo 应用 XRKMS
+echo 应用XRKMS
 if exist "xrkms\xrkms.bat" (
     echo [OSC]正在智能激活系统（可能需要3min）>"%systemdrive%\Windows\Setup\wallname.txt"
     timeout /t 3
@@ -357,25 +363,25 @@ if exist "xrkms\xrkms.bat" (
 )
 
 :osconline
-echo 应用 OSConline
+echo 应用OSConline
 echo [OSC]正在应用 OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "online.bat" echo y | start "" /wait /min "online.bat"
 
 :afterlife
-echo [OSC] 正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC]正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
 if %osver% EQU 2 (
-    echo Win7系统 WU 服务处理
+    echo win7系统 WU 服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 if %osver% EQU 3 (
-    echo Win8 启用UAC
+    echo Win8启用 UAC
     echo yes>"%systemdrive%\Windows\Setup\pandasysuac.txt"
-    echo Win8系统WU服务处理
+    echo win8系统 WU 服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 
 if %osver% EQU 4 (
-    echo Win10+ 系统WU服务处理
+    echo win10+系统 WU 服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasyswu.txt"
 )
 
