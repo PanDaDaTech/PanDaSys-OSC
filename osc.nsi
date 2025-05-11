@@ -185,7 +185,7 @@ Section /o "-PanDaSys 部署接口 - 进桌面" PanDaSysAPI5
     FileClose $0
 	  SetOutPath "$INSTDIR"
 	  SetOverwrite try
-	  DetailPrint "解压并执行API5..."
+	  DetailPrint "解压并执行 API5..."
 	  File ".\api\api.bat"
 		ExecShellWait "open" "$OUTDIR\api.bat" "/5" SW_HIDE
 	${EndIf}
@@ -216,7 +216,7 @@ SectionGroup "优化设置"
     FileOpen $0 "$WINDIR\Setup\pandasysfkwu.txt" w
     FileClose $0
   SectionEnd
-  Section /o "启用UAC"
+  Section /o "启用 UAC"
     DetailPrint "正在输出 TAG - pandasysuac..."
     FileOpen $0 "$WINDIR\Setup\pandasysuac.txt" w
     FileClose $0
