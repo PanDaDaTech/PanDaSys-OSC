@@ -1,7 +1,7 @@
 ﻿Unicode true
 ; 安装程序初始定义常量
-!define PRODUCT_NAME "潇然系统 For PanDaSys"
-!define PRODUCT_DESC "潇然系统优化组件 For PanDaSys"
+!define PRODUCT_NAME "PanDaSys 优化组件"
+!define PRODUCT_DESC "PanDaSys 优化组件"
 ; !define /date PRODUCT_VERSION "3.24.%m.%d"
 !define PRODUCT_PUBLISHER "Xiaoran Studio & PanDaTech"
 !define PRODUCT_WEB_SITE "https://www.pandadatech.cn"
@@ -91,7 +91,7 @@ VIAddVersionKey ProductName "${PRODUCT_NAME} V${PRODUCT_VERSION}" ;产品名称
 VIAddVersionKey ProductVersion "${PRODUCT_VERSION}" ;产品版本
 VIAddVersionKey Comments "${PRODUCT_NAME} V${PRODUCT_VERSION}" ;备注
 VIAddVersionKey CompanyName "${PRODUCT_PUBLISHER}" ;公司名
-VIAddVersionKey LegalCopyright "Copyright @ 2024 ${PRODUCT_PUBLISHER}. All Rights Reserved." ;合法版权
+VIAddVersionKey LegalCopyright "Copyright @ 2025 ${PRODUCT_PUBLISHER}. All Rights Reserved." ;合法版权
 VIAddVersionKey InternalName "${PRODUCT_NAME}" ;内部名称
 VIAddVersionKey LegalTrademarks "${PRODUCT_PUBLISHER}" ;合法商标 ;
 VIAddVersionKey OriginalFilename "osc.exe" ;源文件名
@@ -228,7 +228,7 @@ SectionGroup "优化设置"
   SectionEnd
 SectionGroupEnd
 
-Section "-潇然系统优化组件 For PanDaSys" XROSC
+Section "-潇然系统优化组件 For PanDaSys" PanDaSysOSC
   SetOutPath "$INSTDIR\osc"
   SetOverwrite try
   DetailPrint "解压相关 OSC 数据..."
@@ -252,27 +252,27 @@ Function .onInit
 	${GetParameters} $0 ;获取传入参数
   ${GetOptions} $0 "/1" $1  ;检查执行PanDaSysAPI /1参数
 	IfErrors +3 +1
-	SectionSetFlags ${XROSC} 0
+	SectionSetFlags ${PanDaSysOSC} 0
   SectionSetFlags ${PanDaSysAPI1} 1
   
   ${GetOptions} $0 "/2" $1  ;检查执行PanDaSysAPI /2参数
 	IfErrors +3 +1
-	SectionSetFlags ${XROSC} 0
+	SectionSetFlags ${PanDaSysOSC} 0
   SectionSetFlags ${PanDaSysAPI2} 1
   
   ${GetOptions} $0 "/3" $1  ;检查执行PanDaSysAPI /3参数
 	IfErrors +3 +1
-	SectionSetFlags ${XROSC} 0
+	SectionSetFlags ${PanDaSysOSC} 0
   SectionSetFlags ${PanDaSysAPI3} 1
   
   ${GetOptions} $0 "/4" $1  ;检查执行PanDaSysAPI /4参数
 	IfErrors +3 +1
-	SectionSetFlags ${XROSC} 0
+	SectionSetFlags ${PanDaSysOSC} 0
   SectionSetFlags ${PanDaSysAPI4} 1
   
   ${GetOptions} $0 "/5" $1  ;检查执行PanDaSysAPI /5参数
 	IfErrors +3 +1
-	SectionSetFlags ${XROSC} 0
+	SectionSetFlags ${PanDaSysOSC} 0
   SectionSetFlags ${PanDaSysAPI5} 1
   
 FunctionEnd
