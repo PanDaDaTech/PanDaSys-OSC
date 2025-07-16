@@ -221,36 +221,41 @@ if %osver% GEQ 4 (
         reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".tiff" /t REG_SZ /d "PhotoViewer.FileAssoc.Tiff" /f
         reg add "HKLM\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations" /v ".wdp" /t REG_SZ /d "PhotoViewer.FileAssoc.Wdp" /f
     )
-
+    
+    echo 关闭显示最近添加的应用，关闭显示最常用的应用
+    for /f "delims=*" %%a in ('reg.exe query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount ^| find /i "}$$windows.data.unifiedtile.startglobalproperties"') do (
+        reg.exe add "%%a\Current" /v "Data" /t REG_BINARY /d "0200000061F31E4D36CBDB010000000043420100C21401CB320A0305CEABD3E90224DAF40344C38A016682E58BB1AEFDFDBB3C0005A08FFCC103248AD0034480990166B0B599DCCDB097DE4D00058691CC930524AAA30144C38401669FF79DB187CBD1ACD40100C23C01C55A0100" /f
+    )
+    
     echo 启用任务管理器显示磁盘性能
     if exist "%systemdrive%\Windows\System32\diskperf.exe" diskperf -y
     if exist "%LocalAppData%\Microsoft\WindowsApps\wt.exe" (
-        echo 更换默认控制台为Windows Terminal
+        echo 更换默认控制台为 Windows Terminal
         Reg.exe add "HKCU\Console\%%%%Startup" /v "DelegationConsole" /t REG_SZ /d "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}" /f
         Reg.exe add "HKCU\Console\%%%%Startup" /v "DelegationTerminal" /t REG_SZ /d "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}" /f
     )
-    echo 禁用Smart App Control，修复Windows Installer安装缓慢
+    echo 禁用 Smart App Control，修复 Windows Installer 安装缓慢
     if exist "%systemdrive%\Windows\System32\CiTool.exe" (
         reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /f /v "VerifiedAndReputablePolicyState" /t REG_DWORD /d 0
         echo | CiTool.exe -r
     )
     if !bigversion! GEQ 19041 (
-        echo 启用硬件加速GPU调度
+        echo 启用硬件加速 GPU 调度
         reg add HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers /f /v HwSchMode /t REG_DWORD /d 2
     )
     if !bigversion! GEQ 19041 if !bigversion! LEQ 19045 (
         reg query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds /v IsFeedsAvailable | find /i "0x1" && (
-            echo 强制使用组策略关闭feeds
+            echo 强制使用组策略关闭 Feeds
             reg add "HKLM\Software\Policies\Microsoft\Windows\Windows Feeds" /v "EnableFeeds" /t REG_DWORD /f /d 0
         )
     )
     if !bigversion! GEQ 22000 (
-        echo 处理Win11变小了的输入法候选项字体大小（大）
+        echo 处理 Win11 变小了的输入法候选项字体大小（大）
         reg add HKCU\Software\Microsoft\InputMethod\CandidateWindow\CHS\1 /v FontStyleTSF3 /t REG_SZ /d "18.00pt;Regular;;Microsoft YaHei UI" /f
         if !bigversion! GEQ 22621 (
             echo 任务栏已满时合并
             reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarGlomLevel /t REG_DWORD /d 1
-            echo 任务栏隐藏AI图标
+            echo 任务栏隐藏 AI 图标
             reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarAI /t REG_DWORD /d 0
             reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v ShowCopilotButton /t REG_DWORD /d 0
             echo 启用右键单击即可在任务栏中启用结束任务
