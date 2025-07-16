@@ -1,7 +1,7 @@
 chcp 936 > nul
 setlocal EnableDelayedExpansion
 @echo off
-title 潇然系统优化组件 For PanDaSys pandasys-OSC-For-PanDaSys
+title PanDaSys Project 优化组件 PanDaSys-OSC
 cd /d "%~dp0"
 if exist "%systemdrive%\Windows\SysWOW64\wscript.exe" (
     set "PROCESSOR_ARCHITECTURE=AMD64"
@@ -49,7 +49,7 @@ if exist "%SystemDrive%\Windows\Setup\State\State.ini" (
 :checkenv_winpe
 echo 检测是否在 PE 系统中运行
 if /i "%SystemDrive%"=="x:" if exist "X:\Windows\System32\PECMD.EXE" (
-    echo 不支持在PE系统中运行
+    echo 不支持在 PE 系统中运行
     goto endoff
 )
 
@@ -127,7 +127,7 @@ if exist wandrv2.iso (
     start "" /wait "%~dp0wandrv2\DriveCleaner.exe" /wandrv
     echo wandrv2.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 )
-if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
     for %%a in (C D E F G H) do (
         if exist "%%a:\PanDaTech\OSC\DriverBackup.7z" (
             echo [OSC]正在导入搜到的驱动备份%%a:\~\DriverBackup.7z...>"%systemdrive%\Windows\Setup\wallname.txt"
@@ -259,6 +259,7 @@ if exist "%systemdrive%\Windows\Setup\pandasysfirewall.txt" (
     netsh advfirewall set allprofiles firewallpolicy blockinbound,allowoutbound
     netsh advfirewall set allprofiles settings inboundusernotification enable
     netsh advfirewall set allprofiles settings unicastresponsetomulticast enable
+    @rem netsh advfirewall set allprofiles logging filename %SystemRoot%\System32\LogFiles\Firewall\pfirewall.log
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /f /v "EnableFirewall" /t reg_dword /d 1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /f /v "DisableNotifications" /t reg_dword /d 0
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /f /v "EnableFirewall" /t reg_dword /d 1
@@ -300,15 +301,9 @@ echo 应用运行库
 if exist "runtime\runtime.bat" echo y | start "" /wait /min "runtime\runtime.bat"
 
 :oscapis
-echo 应用 OSCAPI
-if exist "%SystemDrive%\Windows\Setup\zjsoftxrsoftno.txt" (
-    del /f /q "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe"
-)
-if exist "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe" (
-    start "" "%systemdrive%\Windows\Setup\Set\osc\xrsoft.exe" /S
-)
+echo 应用OSCAPI
 if exist "%SystemDrive%\Windows\Setup\Set\osc\Office\Office_*.iso" (
-    echo [OSC]正在应用 Office-ISO...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC]正在应用 Office ISO...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /min /wait cmd /c "%SystemDrive%\Windows\Setup\Set\osc\Office\MSOInst.bat"
 )
 if exist "%SystemDrive%\Windows\Setup\Run\1\api1.bat" (
@@ -355,7 +350,7 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 )
 
 :xrkms
-echo 应用XRKMS
+echo 应用 XRKMS
 if exist "xrkms\xrkms.bat" (
     echo [OSC]正在智能激活系统（可能需要3min）>"%systemdrive%\Windows\Setup\wallname.txt"
     timeout /t 3
@@ -363,30 +358,30 @@ if exist "xrkms\xrkms.bat" (
 )
 
 :osconline
-echo 应用OSConline
-echo [OSC]正在应用 OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
+echo 应用 OSConline
+echo [OSC]正在应用OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "online.bat" echo y | start "" /wait /min "online.bat"
 
 :afterlife
 echo [OSC]正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
 if %osver% EQU 2 (
-    echo win7系统 WU 服务处理
+    echo Win7 系统WU服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 if %osver% EQU 3 (
-    echo Win8启用 UAC
+    echo Win8 启用UAC
     echo yes>"%systemdrive%\Windows\Setup\pandasysuac.txt"
-    echo win8系统 WU 服务处理
+    echo Win8系统WU服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 
 if %osver% EQU 4 (
-    echo win10+系统 WU 服务处理
+    echo Win10+ 系统WU服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasyswu.txt"
 )
 
 :disablewu
-echo 按需关闭 WU
+echo 按需关闭WU
 if exist "%systemdrive%\Windows\Setup\pandasyswu.txt" (
     start "" /wait /min "%~dp0apifiles\Wub.exe" /E
 ) else if exist "%systemdrive%\Windows\Setup\pandasysfkwu.txt" (
