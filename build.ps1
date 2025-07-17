@@ -103,10 +103,10 @@ if (-not (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe")) {
 else {
     # 下载所需文件
     Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/irdVI27gi2pg" -OutFile "osc\runtime\DirectX_Redist_Repack_x86_x64_Final.exe"
-    Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/iImmW2qeilob" -OutFile "osc\runtime\flash.exe"
-    Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iNm6J2u6y7ej" -OutFile "osc\runtime\MSVCRedist.AIO.exe"
+    Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/ivgNv2yiocpg" -OutFile "osc\runtime\flash.exe"
+    Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iFMKz2z1qceb" -OutFile "osc\runtime\MSVCRedist.AIO.exe"
     Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/idHOf2bfs3te" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
-    Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iaLyx2u6ynyf" -OutFile "osc\xrkms\kms.exe"
+    Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iIse82yindri" -OutFile "osc\xrkms\kms.exe"
 }
 
 # 构建
