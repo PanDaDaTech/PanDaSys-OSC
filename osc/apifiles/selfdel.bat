@@ -2,7 +2,6 @@
 chcp 936 > nul
 echo 正在清理相关残留文件...
 rem taskkill /f /im api.exe
-@rem taskkill /f /im EsDeploy.exe
 taskkill /f /im ScDeploy.exe
 taskkill /f /im ScTasks.exe
 rem delete system deploy or drivers temp
@@ -20,8 +19,6 @@ del /f /q "%SystemDrive%\Windows\PETime.dat"
 del /f /q "%SystemDrive%\Windows\NoRun.log"
 del /f /q "%SystemDrive%\Windows\reg.ini"
 del /f /q "%SystemDrive%\Windows\System32\deploy.exe"
-@rem del /f /s /q "%SystemDrive%\Windows\Setup\Set\*"
-@rem rd /s /q "%SystemDrive%\Windows\Setup\Set"
 del /f /q "%SystemDrive%\Windows\Panther\unattend.xml"
 del /f /q "%SystemDrive%\Windows\Panther\unattend1.xml"
 
