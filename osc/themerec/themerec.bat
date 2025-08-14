@@ -2,7 +2,7 @@
 chcp 936 > nul
 cd /d "%~dp0"
 title Ö÷Ìâ»Ö¸´
-if exist "%SystemDrive%\Windows\Setup\xrsysnotheme.txt" exit
+if exist "%SystemDrive%\Windows\Setup\pandasysnotheme.txt" exit
 
 set osver=0
 ver | find /i "5.1." > nul && set osver=1
@@ -73,9 +73,4 @@ if exist "%ProgramW6432%" (
     %PECMD% PINT "%SystemDrive%\Windows\System32\osk.exe",TaskBand
 )
 regedit /s touch.reg
-goto :EOF
-
-:startmenu11
-powershell -Command "Install-ProvisioningPackage -PackagePath .\startmenu11.ppkg -ForceInstall -QuietInstall"
-powershell -Command "Uninstall-ProvisioningPackage -PackagePath .\startmenu11.ppkg"
 goto :EOF
