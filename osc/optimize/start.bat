@@ -260,10 +260,6 @@ if %osver% GEQ 4 (
             echo 启用右键单击即可在任务栏中启用结束任务
             reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings /v TaskbarEndTask /t REG_DWORD /d 1 /f
         )
-        if !bigversion! LEQ 22635 (
-            echo 恢复传统右键菜单
-            reg add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
-        )
         if !bigversion! GEQ 26100 (
             if exist "%SystemDrive%\Windows\System32\sudo.exe" (
                 echo 启用 sudo

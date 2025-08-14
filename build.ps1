@@ -109,8 +109,8 @@ else {
     Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iIse82yindri" -OutFile "osc\xrkms\kms.exe"
     
     # 下载其他文件
-    Invoke-WebRequest -Uri "https://url.xrgzs.top/osconline" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
-    Invoke-WebRequest -Uri "https://url.xrgzs.top/oscsoft" -OutFile "osc\oscsoftof.txt" -ErrorAction Stop
+    Invoke-WebRequest -Uri "https://down.pandadatech.cn/d/lanzou/Config/osconline.bat" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
+    Invoke-WebRequest -Uri "https://down.pandadatech.cn/d/lanzou/Config/oscsoft.txt" -OutFile "osc\oscsoftof.txt" -ErrorAction Stop
 }
 
 # 构建
