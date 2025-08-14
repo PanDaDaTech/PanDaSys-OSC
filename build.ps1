@@ -107,6 +107,10 @@ else {
     Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iFMKz2z1qceb" -OutFile "osc\runtime\MSVCRedist.AIO.exe"
     Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/idHOf2bfs3te" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
     Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iIse82yindri" -OutFile "osc\xrkms\kms.exe"
+    
+    # 下载其他文件
+    Invoke-WebRequest -Uri "https://url.xrgzs.top/osconline" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
+    Invoke-WebRequest -Uri "https://url.xrgzs.top/oscsoft" -OutFile "osc\oscsoftof.txt" -ErrorAction Stop
 }
 
 # 构建
