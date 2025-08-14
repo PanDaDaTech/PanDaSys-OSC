@@ -68,9 +68,11 @@ if %osver% GEQ 2 (
 if %osver% GEQ 3 (
     echo 关闭保留储存
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
+    
     echo 处理 Onedrive 开机启动项
     reg delete HKU\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
     reg delete HKU\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
+    
     echo 禁止自动安装微软电脑管家
     rd /s /q "%ProgramData%\Windows Master Store"
     echo noway>"%ProgramData%\Windows Master Store"
@@ -80,15 +82,29 @@ if %osver% GEQ 3 (
     rd /s /q "%CommonProgramFiles%\microsoft shared\ClickToRun\OnlineInteraction"
     echo noway>"%CommonProgramFiles%\microsoft shared\ClickToRun\OnlineInteraction"
     reg import "%~dp0apifiles\mspcmgr.reg" /reg:32
+
     echo 关闭显示你的数据将在你所在的国家或地区之外进行处理
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
     reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
+    
+    echo 避免自动安装 Outlook、DevHome、微软的管家
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Deprovisioned\Microsoft.OutlookForWindows_8wekyb3d8bbwe" /f
+    reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\OutlookUpdate" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Deprovisioned\Microsoft.Windows.DevHome_8wekyb3d8bbwe" /f
+    reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\DevHomeUpdate" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Deprovisioned\Microsoft.MicrosoftPCManager_8wekyb3d8bbwe" /f
+    reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\PCManagerUpdate" /f
 )
 
 if not exist "%SystemDrive%\WINDOWS\Setup\pandasysnoruntime.txt" (
     if exist "osc\runtime\DirectX_Redist_Repack_x86_x64_Final.exe" (
         echo [API]正在应用 DirectX 运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
         start "" /wait "osc\runtime\DirectX_Redist_Repack_x86_x64_Final.exe" /ai
+    )
+)
+    if exist "osc\runtime\DX9.exe" (
+        echo [API]正在应用DX9运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
+        start "" /wait "osc\runtime\DX9.exe" /S
     )
 )
 
@@ -126,13 +142,6 @@ if exist fonts.exe (
 )
 
 ::应用系统驱动
-if exist pandasysdrv.zip (
-    echo [API]正在解压驱动.zip...>"%systemdrive%\Windows\Setup\wallname.txt"
-    echo %zip% e -r -y pandadrv.zip >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-    %zip% e -r -y pandadrv.zip
-    del /f /q wandrv.iso
-)
-rem ARM64 不支持挂载，需要解压
 if exist wandrv.iso if /i "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
     echo [API]正在解压驱动.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo %zip% e -r -y wandrv.iso >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
@@ -311,7 +320,7 @@ if %osver% GEQ 3 (
     reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f
     echo 禁用 BitLocker 自动加密
-    reg add "HKLM\SYSTEM\CurrentControlSet\BitLocker" /v "PreventDeviceEncryption" /t REG_DWORD /d 1 /f
+    reg add "HKLM\SYSTEM\CurrentControlSet\BitLocker" /v "PreventDeviceEncryption" /t REG_DWORD /d 1 /f 
 )
 if %osver% GEQ 2 (
     bcdedit /timeout 3
@@ -324,10 +333,12 @@ if %osver% GEQ 2 (
         powershell -Command "Get-WmiObject -Class Win32_computersystem | Set-WmiInstance -Property @{AutomaticManagedPagefile=$false}"
     )
 )
+
 echo 创建用户
 if exist "%SystemDrive%\Users\Default\NTUSER.DAT" (
     echo y | start "" /wait /min "%~dp0apifiles\newuser.bat"
 )
+
 echo [API]正在应用DIY接口 api3_bsh.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist api3_bsh.bat call api3_bsh.bat
 if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
@@ -351,7 +362,7 @@ if %osver% GEQ 3 (
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
-    rem 关闭保留储存
+    echo 关闭保留储存
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
     start "" /wait "%~dp0apifiles\Wub.exe" /D /P
@@ -359,7 +370,7 @@ if %osver% GEQ 3 (
     taskkill /f /im WWAHost.exe
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
     reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
-    
+    reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
 )
 echo Login
 for %%a in (Login\*.exe) do (
@@ -398,7 +409,6 @@ start "" "%pecmd%" LOAD "%~dp0apifiles\Wall.wcs"
 echo [API]正在进行桌面环境系统处理...>"%systemdrive%\Windows\Setup\wallname.txt"
 echo win8-11系统APPX、WD、WU驱动处理
 if %osver% GEQ 3 (
-
     regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"

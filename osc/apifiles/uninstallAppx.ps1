@@ -42,7 +42,7 @@ Get-AppxPackage *Microsoft.BingNews* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.GetHelp* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.Getstarted* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.Microsoft3DViewer* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.MicrosoftPCManager* -AllUsers | Remove-AppxPackage
+Get-AppxPackage *Microsoft.MicrosoftPCManager* -AllUsers | Remove-AppxPackage # 微软电脑管家
 Get-AppxPackage *Microsoft.MicrosoftTeams* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.MixedReality.Portal* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.Office.OneNote* -AllUsers | Remove-AppxPackage
@@ -64,15 +64,9 @@ Get-AppxPackage *Microsoft.WidgetsPlatformRuntime* -AllUsers | Remove-AppxPackag
 Get-AppxPackage *Microsoft.Windows.DevHome* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.BingWeather* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.windowscommunicationsapps* -AllUsers | Remove-AppxPackage  # 邮件和日历
-# Get-AppxPackage *Microsoft.GamingApp* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *Microsoft.MicrosoftOfficeHub* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *Microsoft.MicrosoftStickyNotes* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *Microsoft.Todos* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *Microsoft.WindowsFeedbackHub* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *Microsoft.Xbox* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *Microsoft.YourPhone* -AllUsers | Remove-AppxPackage
-# Get-AppxPackage *MicrosoftCorporationII.QuickAssist* -AllUsers | Remove-AppxPackage
+Get-AppxPackage *Microsoft.MicrosoftOfficeHub* -AllUsers | Remove-AppxPackage # Office UWP 客户端，已停止服务
+Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* -AllUsers | Remove-AppxPackage # 蜘蛛纸牌
+Get-AppxPackage *Microsoft.MicrosoftStickyNotes* -AllUsers | Remove-AppxPackage # 便签
 
 # Import registry to disable Microsoft PC Manager
 reg.exe import .\mspcmgr.reg /reg:32

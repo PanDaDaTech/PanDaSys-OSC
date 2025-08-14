@@ -117,9 +117,6 @@ if %osver% GEQ 4 (
     rem 设备管理器显示已断开的设备
     reg add "HKEY_CURRENT_USER\Software\Microsoft\Multimedia\Audio\DeviceCpl" /v "ShowDisconnectedDevices" /t REG_DWORD /d 1 /f
 
-    rem 让 Windows 选择计算机的最佳外观
-    @rem reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d 1 /f
-
     rem 当Windows检测到通信活动时：不执行任何操作
     reg add "HKEY_CURRENT_USER\Software\Microsoft\Multimedia\Audio" /v "UserDuckingPreference" /t REG_DWORD /d 3 /f
 
@@ -229,11 +226,13 @@ if %osver% GEQ 4 (
     
     echo 启用任务管理器显示磁盘性能
     if exist "%systemdrive%\Windows\System32\diskperf.exe" diskperf -y
+
     if exist "%LocalAppData%\Microsoft\WindowsApps\wt.exe" (
         echo 更换默认控制台为 Windows Terminal
         Reg.exe add "HKCU\Console\%%%%Startup" /v "DelegationConsole" /t REG_SZ /d "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}" /f
         Reg.exe add "HKCU\Console\%%%%Startup" /v "DelegationTerminal" /t REG_SZ /d "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}" /f
     )
+
     echo 禁用 Smart App Control，修复 Windows Installer 安装缓慢
     if exist "%systemdrive%\Windows\System32\CiTool.exe" (
         reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /f /v "VerifiedAndReputablePolicyState" /t REG_DWORD /d 0
@@ -289,7 +288,7 @@ if %osver% GEQ 4 (
     schtasks /change /tn "\Microsoft\Windows\Media Center\mcupdate" /disable 
 )
 
-echo [OSC]正在优化浏览器配置...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC]正在清理浏览器设置并优化 MS Edge 配置文件...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "FUCKBrowserConfig.bat" start "" /wait /min "FUCKBrowserConfig.bat" /s
 if exist "bookmarks.exe" start "" /wait /min "bookmarks.exe"
 start explorer.exe
@@ -298,7 +297,7 @@ if %osver% GEQ 4 (
     for /f "tokens=6 delims=[]. " %%a in ('ver') do set bigversion=%%a
     for /f "tokens=7 delims=[]. " %%b in ('ver') do set smallversion=%%b
     if !bigversion! GEQ 22000 (
-        echo 处理Win11开始菜单固定项
+        echo 处理 Win11 开始菜单固定项（去除 Outlook、DevHome、微软电脑管家固定）
         if exist "startmenu11.ppkg" (
             echo 安装预配包
             powershell -Command "Install-ProvisioningPackage -PackagePath .\startmenu11.ppkg -ForceInstall -QuietInstall"

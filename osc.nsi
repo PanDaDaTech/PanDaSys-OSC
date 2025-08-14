@@ -2,7 +2,6 @@
 ; 安装程序初始定义常量
 !define PRODUCT_NAME "PanDaSys 优化组件"
 !define PRODUCT_DESC "PanDaSys 优化组件"
-; !define /date PRODUCT_VERSION "3.24.%m.%d"
 !define PRODUCT_PUBLISHER "Xiaoran Studio & PanDaTech"
 !define PRODUCT_WEB_SITE "https://www.pandadatech.cn"
 !define PRODUCT_VERSION "${CUSTOM_VERSION}"
@@ -228,7 +227,7 @@ SectionGroup "优化设置"
   SectionEnd
 SectionGroupEnd
 
-Section "-潇然系统优化组件 For PanDaSys" PanDaSysOSC
+Section "-PanDaSys 优化组件" PanDaSysOSC
   SetOutPath "$INSTDIR\osc"
   SetOverwrite try
   DetailPrint "解压相关 OSC 数据..."

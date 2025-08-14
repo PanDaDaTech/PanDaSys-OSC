@@ -1,14 +1,9 @@
 $ErrorActionPreference = 'Stop'
-
 # 尝试获取状态
 Get-MpPreference
-
 $ErrorActionPreference = 'SilentlyContinue'
-
 # 过滤白名单路径
 Add-MpPreference -ExclusionPath 'C:\Windows\Setup\Set\*'
-Add-MpPreference -ExclusionPath 'C:\Program Files\Xiaoran\*'
-Add-MpPreference -ExclusionPath 'C:\Program Files (x86)\Xiaoran\*'
 # 设置CPU使用的优先级为低
 Set-MpPreference -EnableLowCpuPriority $true
 # 设置CPU空闲时才执行定时扫描
