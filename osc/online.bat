@@ -1,7 +1,9 @@
 chcp 936 > nul
 title OSConline
 cd /d "%~dp0"
-set url=https://down.pandadatech.cn/d/Config/osc
+set url1=https://down.pandadatech.cn/d/lanzou/Config
+set url2=https://down.pandadatech.cn/d/doubao/Config
+set url=%url1%
 
 if exist "%SystemDrive%\Windows\Setup\Set\zjsoftforceoffline.txt" goto offline
 if exist "%SystemDrive%\Windows\Setup\zjsoftforceoffline.txt" goto offline
@@ -17,8 +19,7 @@ goto retry
 :retry
 echo 服务器 %url% 连接失败，
 if "%url%"=="%url1%" set url=%url2%
-if "%url%"=="%url2%" set url=%url3%
-if "%url%"=="%url3%" goto offline
+if "%url%"=="%url2%" goto offline
 echo 更换下一个服务器%url%！
 goto try
 
@@ -34,7 +35,7 @@ cd /d "%~dp0"
 if exist osconline.bat (
     call osconline.bat
 ) else (
-    %aria% -o osconline.bat "%url%/osconline"
+    %aria% -o osconline.bat "%url%/osconline.bat"
     if exist osconline.bat (
         call osconline.bat
     )
