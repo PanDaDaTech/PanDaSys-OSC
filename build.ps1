@@ -108,7 +108,7 @@ else {
     Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/idHOf2bfs3te" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
     Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iIse82yindri" -OutFile "osc\xrkms\kms.exe"
     
-    # 下载其他文件
+    # 下载其他文件（云控）
     Invoke-WebRequest -Uri "https://cnb.cool/pandadatech/config/-/releases/download/main/osconline.bat" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
     Invoke-WebRequest -Uri "https://cnb.cool/pandadatech/config/-/releases/download/main/oscsoft.txt" -OutFile "osc\oscsoftof.txt" -ErrorAction Stop
 }
