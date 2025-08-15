@@ -284,7 +284,7 @@ if %osver% GEQ 4 (
     schtasks /change /tn "\Microsoft\Windows\Media Center\mcupdate" /disable 
 )
 
-echo [OSC]正在清理浏览器设置并优化 MS Edge 配置文件...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在清理浏览器设置并优化 MS Edge 配置文件...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "FUCKBrowserConfig.bat" start "" /wait /min "FUCKBrowserConfig.bat" /s
 if exist "bookmarks.exe" start "" /wait /min "bookmarks.exe"
 start explorer.exe

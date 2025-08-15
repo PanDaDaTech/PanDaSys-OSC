@@ -201,22 +201,22 @@ copy /y "%stmenupath%\Word.lnk" "%deskpath%\Word.lnk"
 :fixoffice2013
 cls
 if %officevernum% EQU 15 (
-  echo 删除 Office2013 SkyDrive 右键菜单
+  echo 删除 Office 2013 SkyDrive 右键菜单
   reg delete "HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\SPFS.ContextMenu" /f
-  echo 跳过 Office2013 首次引导程序
+  echo 跳过 Office 2013 首次引导程序
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\FirstRun" /f /v "BootedRTM" /t REG_DWORD /d 1
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\Common\General" /f /v "FirstRun" /t REG_DWORD /d 0
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\15.0\Common\General" /f /v "ShownFirstRunOptin" /t REG_DWORD /d 1
 )
 if %officevernum% EQU 16 (
-  echo 跳过 Office2016 首次引导程序
+  echo 跳过 Office 2016 首次引导程序
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\General" /f /v "FirstRun" /t REG_DWORD /d 0
   reg add "HKEY_CURRENT_USER\Software\Microsoft\Office\16.0\Common\General" /f /v "ShownFirstRunOptin" /t REG_DWORD /d 1
 )
 :fixarialfont
 cls
 if %officevernum% LEQ 15 (
-  echo 解决 Office2016 以下版本中文未知字体难看的问题
+  echo 解决 Office 2016 以下版本中文未知字体难看的问题
   reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" /f /v "Arial Unicode MS (TrueType)"
   del /f /q "%SystemDrive%\Windows\Fonts\ARIALUNI.TTF"
 )

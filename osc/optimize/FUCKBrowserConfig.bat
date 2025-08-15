@@ -3,20 +3,10 @@ chcp 936 > nul
 set ver=FUCK Browser Config by Xiaoran Studio V2.15 (Build 2025.4.19)
 title %ver%
 mode con:cols=64
-@rem  lines=25
 color 1f
 
 :silentset
-rem ↓↓↓↓↓↓↓↓↓↓请输入修改的主页↓↓↓↓↓↓↓↓↓↓
 set homepage=http://www.baidu.com
-rem ↑↑↑↑↑↑↑↑↑↑请输入修改的主页↑↑↑↑↑↑↑↑↑↑
-rem ↓↓↓↓↓↓↓↓↓↓封装/静默请去掉注释↓↓↓↓↓↓↓↓↓↓
-rem set slientmode=true
-rem ↑↑↑↑↑↑↑↑↑↑封装/静默请去掉注释↑↑↑↑↑↑↑↑↑↑
-rem ↓↓↓↓↓↓↓↓↓↓PE下运行请预先设置盘符↓↓↓↓↓↓↓↓↓↓
-rem set SystemDrive=C:
-rem ↑↑↑↑↑↑↑↑↑↑PE下运行请预先设置盘符↑↑↑↑↑↑↑↑↑↑
-rem 可以直接通过/S参数静默运行！
 if /i "%1"=="/s" (
     set slientmode=true
 )
