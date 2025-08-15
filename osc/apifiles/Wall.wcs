@@ -11,8 +11,8 @@ ENVI Name=系统正在安装/部署/优化中，请勿操作电脑！
 WRIT "%SystemDrive%\Windows\Setup\wallname.txt",$1,%Name%
 
 // 读取外置壁纸
-IFEX "%SystemDrive%\Windows\Setup\Set\BG.jpg" ,FILE "%SystemDrive%\Windows\Setup\Set\BG.jpg"=>wall.jpg
-IFEX ! "wall.jpg" ,FILE "%SystemDrive%\Windows\Web\Wallpaper\Windows\img0.jpg"=>wall.jpg
+IFEX "%SystemDrive%\Windows\Setup\Set\BG.jpg" ,FILE "%SystemDrive%\Windows\Setup\Set\BG.jpg"=>bg.jpg
+IFEX ! "bg.jpg" ,FILE "%SystemDrive%\Windows\Web\Wallpaper\Windows\img0.jpg"=>bg.jpg
 
 // 主窗口，启动！
 CALL WIN1
@@ -34,7 +34,7 @@ _SUB DRAW
     
     // 背景图片
     ENVI @BKG.*del=
-    IMAG BKG,W%ScrW%H%ScrH%,wall.jpg,
+    IMAG BKG,W%ScrW%H%ScrH%,bg.jpg,
     
     // 任务标题
     ENVI @LABE1.*del=

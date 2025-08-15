@@ -1,7 +1,6 @@
 @echo off
 chcp 936 > nul
 echo 正在清理相关残留文件...
-rem taskkill /f /im api.exe
 taskkill /f /im ScDeploy.exe
 taskkill /f /im ScTasks.exe
 rem delete system deploy or drivers temp

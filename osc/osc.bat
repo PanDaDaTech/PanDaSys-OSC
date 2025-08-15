@@ -94,7 +94,6 @@ for %%a in (C D E F G H) do (
 
 :oscdrivers
 echo 电源选项设置
-rem POWERCFG -HIBERNATE OFF
 powercfg /h off
 POWERCFG -CHANGE -monitor-timeout-ac 0
 POWERCFG -CHANGE -monitor-timeout-dc 0
@@ -148,8 +147,64 @@ if exist "optimize\start.bat" (
     echo y | start "" /wait /min "optimize\start.bat"
 )
 
+:powercfg
+echo 电源处理
+set notebook=0
+echo wxp-11判断是否为笔记本电脑
+if exist "%SystemDrive%\Windows\System32\wbem\WMIC.exe" (
+    for /f "tokens=2 delims={}" %%a in ('wmic PATH Win32_SystemEnclosure get ChassisTypes /value') do (
+        if %%a GEQ 8 (
+            for /f "tokens=2 delims==" %%b in ('wmic path Win32_Battery get BatteryStatus /value') do (
+                if %%b GEQ 1 set notebook=1
+            )
+        )
+    )
+) else (
+    if defined PSModulePath (
+        for /f "tokens=*" %%a in ('PowerShell "(Get-WmiObject Win32_SystemEnclosure).ChassisTypes"') do (
+            if %%a GEQ 8 (
+                for /f "tokens=*" %%b in ('PowerShell "(Get-WmiObject Win32_Battery).BatteryStatus"') do (
+                    if %%b GEQ 1 set notebook=1
+                )
+            )
+        )
+    )
+)
+
+rem 针对品牌机 MoDT，去除识别笔记本内容
+if exist "%SystemDrive%\Windows\Setup\zjsoftspoem.txt" set notebook=0
+
+echo 防缩肛
+powercfg setactive SCHEME_BALANCED
+
+if %notebook% GEQ 1 (
+    echo 笔记本启用休眠
+    powercfg /h on
+    echo 笔记本禁用小键盘
+    reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t REG_SZ /d 0 /f
+    echo 笔记本开启自动息屏
+    POWERCFG /x monitor-timeout-dc 5
+    POWERCFG /x standby-timeout-dc 30
+    echo 笔记本开启快速启动
+    reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager\Power" /v "HiberbootEnabled" /t REG_DWORD /d 1 /f
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v "HiberbootEnabled" /t REG_DWORD /d 1 /f
+) else (
+    echo 台式机开启小键盘
+    reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t REG_SZ /d 2 /f
+    echo 电源按钮功能设置为关机
+    powercfg -setdcvalueindex SCHEME_MAX SUB_BUTTONS PBUTTONACTION 3
+    powercfg -setacvalueindex SCHEME_MAX SUB_BUTTONS PBUTTONACTION 3
+    powercfg -setdcvalueindex SCHEME_MIN SUB_BUTTONS PBUTTONACTION 3
+    powercfg -setacvalueindex SCHEME_MIN SUB_BUTTONS PBUTTONACTION 3
+    powercfg -setdcvalueindex SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 3
+    powercfg -setacvalueindex SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 3
+    echo 禁用USB选择性暂停
+    powercfg -setdcvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
+    powercfg -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
+)
+
 :themerec
-echo [OSC]正在恢复系统主题...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在恢复系统主题...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "themerec\themerec.bat" echo y | start "" /wait /min "themerec\themerec.bat"
 
 :changepcname
@@ -209,7 +264,7 @@ if exist "%systemdrive%\Windows\Setup\pandasyspasswd.txt" (
 endlocal
 
 :restorewifi
-echo 还原备份的WIFI密码
+echo 还原备份的 WIFI 密码
 if %osver% GEQ 2 (
     for %%a in (C D E F G H) do (
         if exist "%%a:\PanDaTech\WLANPassword\*.xml" (
@@ -259,7 +314,6 @@ if exist "%systemdrive%\Windows\Setup\pandasysfirewall.txt" (
     netsh advfirewall set allprofiles firewallpolicy blockinbound,allowoutbound
     netsh advfirewall set allprofiles settings inboundusernotification enable
     netsh advfirewall set allprofiles settings unicastresponsetomulticast enable
-    @rem netsh advfirewall set allprofiles logging filename %SystemRoot%\System32\LogFiles\Firewall\pfirewall.log
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /f /v "EnableFirewall" /t reg_dword /d 1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /f /v "DisableNotifications" /t reg_dword /d 0
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile" /f /v "EnableFirewall" /t reg_dword /d 1
@@ -300,49 +354,49 @@ if exist "%systemdrive%\Windows\Setup\pandasysrdp.txt" (
 echo 应用运行库
 if exist "runtime\runtime.bat" echo y | start "" /wait /min "runtime\runtime.bat"
 
-:oscapis
-echo 应用OSCAPI
+:oscapis1
+echo 应用 OSC-API1
 if exist "%SystemDrive%\Windows\Setup\Set\osc\Office\Office_*.iso" (
-    echo [OSC]正在应用 Office ISO...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC] 正在应用 Office ISO...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /min /wait cmd /c "%SystemDrive%\Windows\Setup\Set\osc\Office\MSOInst.bat"
 )
 if exist "%SystemDrive%\Windows\Setup\Run\1\api1.bat" (
-    echo [OSC]正在应用 DIY 接口 api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC] 正在应用 DIY 接口 api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /max /wait "%SystemDrive%\Windows\Setup\Run\1\api1.bat"
 )
 for %%b in (%SystemDrive%\Windows\Setup\Run\1\*.exe) do (
-    echo [OSC]正在安装 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC] 正在安装 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%b" /S
     del /f /q "%%b"
 )
 for %%b in (%SystemDrive%\Windows\Setup\Run\1\*.msi) do (
-    echo [OSC]正在安装 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC] 正在安装 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%%b" /passive /qb-! /norestart
     del /f /q "%%b"
 )
 for %%b in (%SystemDrive%\Windows\Setup\Run\1\*.reg) do (
-    echo [OSC]正在应用 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC] 正在应用 %%~nxb...>"%systemdrive%\Windows\Setup\wallname.txt"
     regedit /s "%%b"
     del /f /q "%%b"
 )
 if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
         if exist "%%a:\PanDaTech\OSC\api1.bat" (
-            echo [OSC]正在应用搜到的 DIY 接口 %%a:\~\api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+            echo [OSC] 正在应用搜到的 DIY 接口 %%a:\~\api1.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
             echo y | start "" /max /wait "%%a:\PanDaTech\OSC\api1.bat"
         )
         for %%b in (%%a:\PanDaTech\OSC\1\*.exe) do (
-            echo [OSC]正在运行搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+            echo [OSC] 正在运行搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /S
             del /f /q "%%b"
         )
         for %%b in (%%a:\PanDaTech\OSC\1\*.msi) do (
-            echo [OSC]正在安装搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+            echo [OSC] 正在安装搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             start "" /wait "%%b" /passive /qb-! /norestart
             del /f /q "%%b"
         )
         for %%b in (%%a:\PanDaTech\OSC\1\*.reg) do (
-            echo [OSC]正在应用搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+            echo [OSC] 正在应用搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
             regedit /s "%%b"
             del /f /q "%%b"
         )
@@ -352,36 +406,124 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 :xrkms
 echo 应用 XRKMS
 if exist "xrkms\xrkms.bat" (
-    echo [OSC]正在智能激活系统（可能需要3min）>"%systemdrive%\Windows\Setup\wallname.txt"
+    echo [OSC] 正在智能激活系统（可能需要 3min）>"%systemdrive%\Windows\Setup\wallname.txt"
     timeout /t 3
     echo y | start "" /wait "xrkms\xrkms.bat"
 )
 
-:osconline
-echo 应用 OSConline
-echo [OSC]正在应用OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
-if exist "online.bat" echo y | start "" /wait /min "online.bat"
+:oscapis2
+echo 应用 OSC-API2
+if exist "%SystemDrive%\Windows\Setup\Run\2\api2.bat" (
+    echo [OSC] 正在应用 DIY 接口 api2.bat ...>"%systemdrive%\Windows\Setup\wallname.txt"
+    start "" /max /wait "%SystemDrive%\Windows\Setup\Run\2\api2.bat"
+)
+for %%b in (%SystemDrive%\Windows\Setup\Run\2\*.exe) do (
+    echo [OSC] 正在安装预装软件 %%b ...>"%systemdrive%\Windows\Setup\wallname.txt"
+    start "" /wait "%%b" /S
+    del /f /q "%%b"
+)
+for %%b in (%SystemDrive%\Windows\Setup\Run\2\*.msi) do (
+    echo [OSC] 正在安装预装软件 %%b ...>"%systemdrive%\Windows\Setup\wallname.txt"
+    start "" /wait "%%b" /passive /qb-! /norestart
+    del /f /q "%%b"
+)
+for %%b in (%SystemDrive%\Windows\Setup\Run\2\*.reg) do (
+    echo [OSC] 正在应用注册表 %%b ...>"%systemdrive%\Windows\Setup\wallname.txt"
+    regedit /s "%%b"
+    del /f /q "%%b"
+)
+
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
+    for %%a in (C D E F G H) do (
+        if exist "%%a:\PanDaTech\OSC\api2.bat" (
+            echo [OSC] 正在应用搜到的 DIY 接口 %%a:\~\api2.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
+            start "" /max /wait "%%a:\PanDaTech\OSC\api2.bat"
+        )
+        for %%b in (%%a:\PanDaTech\OSC\2\*.exe) do (
+            echo [OSC] 正在运行搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+            start "" /wait "%%b" /S
+            del /f /q "%%b"
+        )
+        for %%b in (%%a:\PanDaTech\OSC\2\*.msi) do (
+            echo [OSC] 正在安装搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+            start "" /wait "%%b" /passive /qb-! /norestart
+            del /f /q "%%b"
+        )
+        for %%b in (%%a:\PanDaTech\OSC\2\*.reg) do (
+            echo [OSC] 正在应用搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
+            regedit /s "%%b"
+            del /f /q "%%b"
+        )
+    )
+)
 
 :afterlife
-echo [OSC]正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
+
+echo 尝试卸载 OneDrive
+if %osver% GEQ 4 (
+    echo 尝试卸载 OneDrive
+    taskkill /f /im OneDrive.exe
+    taskkill /f /im OneDrive*.exe
+    for /d %%f in ("%localappdata%\Microsoft\OneDrive\*") do (if exist "%%f\OneDriveSetup.exe" "%%f\OneDriveSetup.exe" /uninstall)
+
+    echo 关闭 OneDrive 开机自启
+    reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
+    reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
+    del /f /q "%SystemDrive%\Windows\System32\Tasks\OneDrive*"
+
+    echo 干掉 OneDrive 资源菜单
+    for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
+    for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
+
+    echo 删除 OneDrive 残留
+    if not exist "%USERPROFILE%\Appdata\Local\Microsoft\OneDrive\OneDrive.exe" (
+    del /f /q "%AppData%\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk"
+    rd /s /q "%LocalAppData%\Microsoft\OneDrive"
+    rd /s /q "%ProgramData%\Microsoft OneDrive"
+    rd /s /q "%SystemDrive%\OneDriveTemp"
+    REG Delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
+    REG Delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
+)
+
+echo 关闭驱动面板开机自启
+reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v RTHDVCPL /f
+reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v HotKeysCmds /f
+
+echo 解决 Office 2016 以下版本中文未知字体难看的问题
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" /v "Arial Unicode MS (TrueType)" /f
+del /f /q "%SystemDrive%\Windows\Fonts\ARIALUNI.TTF"
+
+echo 清理重复的浏览器图标
+if exist "%PUBLIC%\Desktop\Microsoft Edge.lnk" (
+    if exist "%USERPROFILE%\Desktop\Microsoft Edge.lnk" del /f /q "%USERPROFILE%\Desktop\Microsoft Edge.lnk"
+) else if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" (
+    copy /y "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" "%PUBLIC%\Desktop\Microsoft Edge.lnk"
+)
+if exist "%PUBLIC%\Desktop\Google Chrome.lnk" if exist "%USERPROFILE%\Desktop\Google Chrome.lnk" del /f /q "%USERPROFILE%\Desktop\Google Chrome.lnk"
+
+echo 输出 TAG
+del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.exe"
+del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.vbs"
+
 if %osver% EQU 2 (
-    echo Win7 系统WU服务处理
+    echo Win7 系统 WU 服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 if %osver% EQU 3 (
-    echo Win8 启用UAC
+    echo Win8 启用 UAC
     echo yes>"%systemdrive%\Windows\Setup\pandasysuac.txt"
-    echo Win8系统WU服务处理
+    echo Win8系统 WU 服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 )
 
 if %osver% EQU 4 (
-    echo Win10+ 系统WU服务处理
+    echo Win10+ 系统 WU 服务处理
     echo yes>"%systemdrive%\Windows\Setup\pandasyswu.txt"
 )
 
 :disablewu
-echo 按需关闭WU
+echo 按需关闭 WU
 if exist "%systemdrive%\Windows\Setup\pandasyswu.txt" (
     start "" /wait /min "%~dp0apifiles\Wub.exe" /E
 ) else if exist "%systemdrive%\Windows\Setup\pandasysfkwu.txt" (
@@ -392,14 +534,15 @@ if exist "%systemdrive%\Windows\Setup\pandasyswu.txt" (
 
 :endosc
 echo 部署完成
+
 cd /d "%~dp0"
 echo successful>"%SystemDrive%\Windows\Setup\oscstate.txt"
 echo successfuldel>"%SystemDrive%\Windows\Setup\oscstate.txt"
 if not exist "%SystemDrive%\Windows\Setup\Set\api.bat" (
     echo exit>"%systemdrive%\Windows\Setup\wallname.txt"
     shutdown /r /t 5 /c "系统部署完成，重启后生效（OSC）"
+    if exist selfdel.bat start /min /wait selfdel.bat
 )
-if exist selfdel.bat start /min selfdel.bat
 
 :endoff
 exit

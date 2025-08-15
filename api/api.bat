@@ -422,6 +422,33 @@ if %osver% GEQ 4 (
     taskkill /f /im onedrive.exe
     taskkill /f /im onedrivesetup.exe
 )
+
+echo 尝试卸载 OneDrive
+if %osver% GEQ 4 (
+    echo 尝试卸载 OneDrive
+    taskkill /f /im OneDrive.exe
+    taskkill /f /im OneDrive*.exe
+    for /d %%f in ("%localappdata%\Microsoft\OneDrive\*") do (if exist "%%f\OneDriveSetup.exe" "%%f\OneDriveSetup.exe" /uninstall)
+
+    echo 关闭 OneDrive 开机自启
+    reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
+    reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
+    del /f /q "%SystemDrive%\Windows\System32\Tasks\OneDrive*"
+
+    echo 干掉 OneDrive 资源菜单
+    for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
+    for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
+
+    echo 删除 OneDrive 残留
+    if not exist "%USERPROFILE%\Appdata\Local\Microsoft\OneDrive\OneDrive.exe" (
+    del /f /q "%AppData%\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk"
+    rd /s /q "%LocalAppData%\Microsoft\OneDrive"
+    rd /s /q "%ProgramData%\Microsoft OneDrive"
+    rd /s /q "%SystemDrive%\OneDriveTemp"
+    REG Delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
+    REG Delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
+)
+    
 echo 修复双用户问题
 if /i not "%USERNAME%"=="Administrator" (
     NET USER Administrator /ACTIVE:NO
@@ -512,6 +539,26 @@ if %osver% GEQ 3 (
     echo Win8-11 系统 WU 驱动处理
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-enable.reg"
 )
+
+echo 关闭驱动面板开机自启
+reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v RTHDVCPL /f
+reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v HotKeysCmds /f
+
+echo 解决 Office 2016 以下版本中文未知字体难看的问题
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" /v "Arial Unicode MS (TrueType)" /f
+del /f /q "%SystemDrive%\Windows\Fonts\ARIALUNI.TTF"
+
+echo 清理重复的浏览器图标
+if exist "%PUBLIC%\Desktop\Microsoft Edge.lnk" (
+    if exist "%USERPROFILE%\Desktop\Microsoft Edge.lnk" del /f /q "%USERPROFILE%\Desktop\Microsoft Edge.lnk"
+) else if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" (
+    copy /y "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" "%PUBLIC%\Desktop\Microsoft Edge.lnk"
+)
+if exist "%PUBLIC%\Desktop\Google Chrome.lnk" if exist "%USERPROFILE%\Desktop\Google Chrome.lnk" del /f /q "%USERPROFILE%\Desktop\Google Chrome.lnk"
+
+echo 输出 TAG
+del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.exe"
+del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.vbs"
 
 echo 清理残留
 regedit /s "%~dp0apifiles\cleanup.reg"
