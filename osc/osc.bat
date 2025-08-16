@@ -351,7 +351,7 @@ if exist "%systemdrive%\Windows\Setup\pandasysrdp.txt" (
 )
 
 :runtime
-echo 应用运行库
+echo 应用外置运行库
 if exist "runtime\runtime.bat" echo y | start "" /wait /min "runtime\runtime.bat"
 
 :oscapis1
@@ -460,31 +460,36 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 :afterlife
 echo [OSC] 正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
 
-echo 尝试卸载 OneDrive
+echo 关闭 Edge OneDrive
 if %osver% GEQ 4 (
-    echo 尝试卸载 OneDrive
-    taskkill /f /im OneDrive.exe
-    taskkill /f /im OneDrive*.exe
-    for /d %%f in ("%localappdata%\Microsoft\OneDrive\*") do (if exist "%%f\OneDriveSetup.exe" "%%f\OneDriveSetup.exe" /uninstall)
-
-    echo 关闭 OneDrive 开机自启
-    reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
-    reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
-    del /f /q "%SystemDrive%\Windows\System32\Tasks\OneDrive*"
-
-    echo 干掉 OneDrive 资源菜单
-    for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
-    for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
-
-    echo 删除 OneDrive 残留
-    if not exist "%USERPROFILE%\Appdata\Local\Microsoft\OneDrive\OneDrive.exe" (
-    del /f /q "%AppData%\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk"
-    rd /s /q "%LocalAppData%\Microsoft\OneDrive"
-    rd /s /q "%ProgramData%\Microsoft OneDrive"
-    rd /s /q "%SystemDrive%\OneDriveTemp"
-    REG Delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
-    REG Delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
+    taskkill /f /im msedge.exe
+    taskkill /f /im msedgewebview2.exe
+    taskkill /f /im MicrosoftEdgeUpdate.exe
+    taskkill /f /im onedrive.exe
+    taskkill /f /im onedrivesetup.exe
 )
+
+echo 尝试卸载 OneDrive
+for /d %%f in ("%localappdata%\Microsoft\OneDrive\*") do (if exist "%%f\OneDriveSetup.exe" "%%f\OneDriveSetup.exe" /uninstall)
+
+echo 关闭 OneDrive 开机自启
+reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
+reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
+del /f /q "%SystemDrive%\Windows\System32\Tasks\OneDrive*"
+
+echo 干掉 OneDrive 资源菜单
+for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
+for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
+
+echo 删除 OneDrive 残留
+if not exist "%USERPROFILE%\Appdata\Local\Microsoft\OneDrive\OneDrive.exe" (
+del /f /q "%AppData%\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk"
+rd /s /q "%USERPROFILE%\OneDrive"
+rd /s /q "%LocalAppData%\Microsoft\OneDrive"
+rd /s /q "%ProgramData%\Microsoft OneDrive"
+rd /s /q "%SystemDrive%\OneDriveTemp"
+reg delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
+reg delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
 
 echo 关闭驱动面板开机自启
 reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v RTHDVCPL /f
@@ -500,7 +505,6 @@ if exist "%PUBLIC%\Desktop\Microsoft Edge.lnk" (
 ) else if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" (
     copy /y "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" "%PUBLIC%\Desktop\Microsoft Edge.lnk"
 )
-if exist "%PUBLIC%\Desktop\Google Chrome.lnk" if exist "%USERPROFILE%\Desktop\Google Chrome.lnk" del /f /q "%USERPROFILE%\Desktop\Google Chrome.lnk"
 
 echo 输出 TAG
 del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.exe"
@@ -534,7 +538,6 @@ if exist "%systemdrive%\Windows\Setup\pandasyswu.txt" (
 
 :endosc
 echo 部署完成
-
 cd /d "%~dp0"
 echo successful>"%SystemDrive%\Windows\Setup\oscstate.txt"
 echo successfuldel>"%SystemDrive%\Windows\Setup\oscstate.txt"

@@ -2,7 +2,7 @@ chcp 936 > nul
 cd /d "%~dp0"
 title [OSC] 运行库智能安装器
 if not defined osver exit
-echo [OSC] 正在安装运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在安装外置运行库...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "%SystemDrive%\WINDOWS\Setup\pandasysnoruntime.txt" exit
 
 :vc
@@ -32,11 +32,11 @@ if not exist "%SystemDrive%\Windows\System32\vcamp120.dll" ( set /A i=i+1 )
 @rem if %osver% equ 1 ( set i=0 )
 if %i% GEQ 2 (
     if exist MSVCRedist.AIO.exe (
-        echo [OSC] 正在应用 VC 运行库 by XRSYS...>"%systemdrive%\Windows\Setup\wallname.txt"
+        echo [OSC] 正在应用 VC 运行库 By XRSYS...>"%systemdrive%\Windows\Setup\wallname.txt"
         start "" /wait "%PECMD%" EXEC -wait -timeout:300000 MSVCRedist.AIO.exe /S
         del /f /q MSVCRedist.AIO.exe
     ) else if exist MSVBCRT.AIO.exe (
-        echo [OSC] 正在应用 VC 运行库 by Dreamcast...>"%systemdrive%\Windows\Setup\wallname.txt"
+        echo [OSC] 正在应用 VC 运行库 By Dreamcast...>"%systemdrive%\Windows\Setup\wallname.txt"
         start "" /wait "%PECMD%" EXEC -wait -timeout:300000 MSVBCRT.AIO.exe /SP- /SILENT /SUPPRESSMSGBOXES /NORESTART /COMPONENTS="vbvc567,vc2005,vc2008,vc2010,vc2012,vc2013,vc2019,vc2022,uc10,vstor"
         del /f /q MSVBCRT.AIO.exe
     ) else if exist VC.exe (
@@ -86,28 +86,4 @@ if exist "PWSH\*.msi" (
     for %%a in ("PWSH\*.msi") do start "" /wait "%PECMD%" EXEC -wait -timeout:300000 msiexec.exe /package "%%~fa" /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1
 )
 
-if not %osver% equ 4 exit
-
-echo [OSC] 正在安装 UWP 扩展解码插件...>"%systemdrive%\Windows\Setup\wallname.txt"
-cd /d "%~dp0"
-call :Add-ProvisionedAppxPackage "Microsoft.VCLibs.140.00"
-call :Add-ProvisionedAppxPackage "Microsoft.AV1VideoExtension"
-call :Add-ProvisionedAppxPackage "Microsoft.HEIFImageExtension"
-call :Add-ProvisionedAppxPackage "Microsoft.MPEG2VideoExtension"
-call :Add-ProvisionedAppxPackage "Microsoft.RawImageExtension"
-call :Add-ProvisionedAppxPackage "Microsoft.VP9VideoExtensions"
-call :Add-ProvisionedAppxPackage "Microsoft.WebMediaExtensions"
-call :Add-ProvisionedAppxPackage "Microsoft.WebpImageExtension"
-call :Add-ProvisionedAppxPackage "Microsoft.HEVCVideoExtensions"
 exit
-
-:Add-ProvisionedAppxPackage
-for %%a in (Extension\%~1*) do (
-    echo installing - %%~na
-    if exist "%%~dpna.xml" (
-        Powershell -Command Add-AppxProvisionedPackage -LicensePath "%%~dpna.xml" -Online -PackagePath "%%~fa"
-    ) else (
-        Powershell -Command Add-AppxProvisionedPackage -SkipLicense -Online -PackagePath "%%~fa"
-    )
-)
-goto :EOF

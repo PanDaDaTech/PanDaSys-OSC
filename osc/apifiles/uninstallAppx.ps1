@@ -65,6 +65,7 @@ Get-AppxPackage *Microsoft.Windows.DevHome* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.BingWeather* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.windowscommunicationsapps* -AllUsers | Remove-AppxPackage  # 邮件和日历
 Get-AppxPackage *Microsoft.MicrosoftOfficeHub* -AllUsers | Remove-AppxPackage # Office UWP 客户端，已停止服务
+Get-AppxPackage *Microsoft.Edge.GameAssist* -AllUsers | Remove-AppxPackage  # 游戏助手（结果待测）
 Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* -AllUsers | Remove-AppxPackage # 蜘蛛纸牌
 Get-AppxPackage *Microsoft.MicrosoftStickyNotes* -AllUsers | Remove-AppxPackage # 便签
 
