@@ -44,6 +44,22 @@ _SUB DRAW
     ENVI @LABE2.*del=
     LABE -center -trans LABE2,L0T80W%ScrW%H30,%Name%,,0xffffff,14,
     
+    // 版本号居中显示
+    READ Version.txt,1,OSCVER
+    CALC 信息上=%ScrH%-1-50
+    EXEC*N VER=!CMD.EXE /C VER
+    MSTR * VER=<-1>VER
+    MSTR * VER=-2,0,VER
+    REGI .HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\BuildLabEx,BuildLabEx
+    MSTR * -delims:. SPBuild=<2>BuildLabEx
+    IFEX #%SPBuild%>1,ENVI VER=%VER%.%SPBuild%
+    REGI .HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\BuildLabEx,内部版本
+    REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\DisplayVersion,显示版本
+    IFEX |%显示版本%=,REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CSDVersion,显示版本
+    ENVI ?系统架构=PEBIT,%windir%\system32
+    LABE -center -trans ,L0T%信息上%W%ScrW%H30,系统版本 %显示版本% [%VER%] | 系统架构 %系统架构% | Powered By PanDaSys-OSC Ver %OSCVER%,,0xffffff,10
+    CALC 信息上=%信息上%
+
     CALL SYSINFO
     // 读取镜像状态
     REGI .HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\State\ImageState,ImageState
@@ -56,10 +72,10 @@ _SUB DRAW
         FIND explorer.exe,CALL WBTN
     }
     // PE调试时显示最小化按钮
-    IFEX x:\Windows\PanDaPE\Icon\X.ico,CALL WBTN
-    // 副标题显示镜像信息
+    IFEX X:\Windows\PanDaPE\Icon\X.ico,CALL WBTN
+    // 主标题显示镜像信息
     READ "%SystemDrive%\Windows\Version.txt",1,SYSVER
-    IFEX ! |%SYSVER%=,ENVI @LABE2=%SYSVER%
+    IFEX ! |%SYSVER%=,ENVI @LABE1=%SYSVER%
 
 _END
 
@@ -93,45 +109,31 @@ _SUB SYSINFO
     
     // 信息区域
     CALC 信息左=48
-    CALC 信息条左=%信息左%+80
-    CALC 信息上=%ScrH%-42-200
-    
-    REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName,产品名称
-    REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\DisplayVersion,显示版本
-    IFEX |%显示版本%=,REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CSDVersion,显示版本
-    ENVI ?系统架构=PEBIT,%windir%\system32
-    LABE -left -trans ,L%信息左%T%信息上%W500H30,系统版本：%产品名称% %显示版本% %系统架构%,,0xffffff,12
-    CALC 信息上=%信息上%+30
+    CALC 信息上=%ScrH%-42-210
 
-    EXEC*N VER=!CMD.EXE /C VER
-    MSTR * VER=<-1>VER
-    MSTR * VER=-2,0,VER
-    REGI .HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\BuildLabEx,BuildLabEx
-    MSTR * -delims:. SPBuild=<2>BuildLabEx
-    IFEX #%SPBuild%>1,ENVI VER=%VER%.%SPBuild%
-    REGI .HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\BuildLabEx,内部版本
-    LABE -left -trans ,L%信息左%T%信息上%W500H30,内部版本：%VER%,,0xffffff,12
+    LABE -left -trans ,L%信息左%T%信息上%W500H30,处理器,,0xffffff,14
     CALC 信息上=%信息上%+30
-
     REGI .HKLM\HARDWARE\DESCRIPTION\System\CentralProcessor\0\ProcessorNameString,处理器
-    LABE -left -trans ,L%信息左%T%信息上%W500H30,处理器：%处理器%,CALC -gui,0xffffff,12
+    LABE -left -trans ,L%信息左%T%信息上%W500H30,%处理器%,,0xffffff,12
     CALC 信息上=%信息上%+30
     
+    LABE -left -trans ,L%信息左%T%信息上%W500H30,内存,,0xffffff,14
+    CALC 信息上=%信息上%+30
     TEAM FIND MEM=?,总内存|CALC 内存=%总内存%/1024#2
-    LABE -left -trans 内存情况L,L%信息左%T%信息上%W500H30,内存：%内存% GB,KILL -gui,0xffffff,12
+    LABE -left -trans 内存情况L,L%信息左%T%信息上%W500H30,%内存% GB,,0xffffff,12
     CALC 信息上=%信息上%+30
     
+    LABE -left -trans ,L%信息左%T%信息上%W500H30,主板,,0xffffff,14
+    CALC 信息上=%信息上%+30
     REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardManufacturer,主板厂商
-        REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardProduct,主板型号
+    REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardProduct,主板型号
     IFEX ! |%主板厂商%=,
     {
-        LABE -left -trans ,L%信息左%T%信息上%W500H30,主板：%主板厂商% %主板型号%,,0xffffff,12
+        LABE -left -trans ,L%信息左%T%信息上%W500H30,%主板厂商% %主板型号%,,0xffffff,12
         CALC 信息上=%信息上%+30
-    }
-
-    READ Version.txt,1,OSCVER
-    LABE -left -trans ,L%信息左%T%信息上%W500H30,程序版本：%OSCVER%,,0xffffff,12
-    CALC 信息上=%信息上%+30
+        
+    }   
+    
 
 _END
 
@@ -149,25 +151,13 @@ _SUB 刷新标题
     IFEX |%NameNew%<>%Name%,
     {
         ENVI Name=%NameNew%
-        ENVI @LABE1=%Name%
+        ENVI @LABE2=%Name%
     }
     IFEX |%NameNew%=exit,
     {
         CALL 显示任务栏
         FILE "%SystemDrive%\Windows\Setup\wallname.txt"
         EXIT FILE
-    }
-_END
-
-_SUB 刷新检测
-    IFEX MEM=?,可用内存
-	CALC 已用内存=(%总内存%-%可用内存%)/1024#2
-    ENVI 内存情况L1=内存：%内存% GB (总) / %已用内存% GB (已用)
-    IFEX ! |%内存情况L%=%内存情况L1%,
-    {
-        ENVI @内存情况L=%内存情况L1%
-	    CALC 内存百分比=100-%可用内存%/%总内存%*100#0
-	    ENVI @内存情况P=%内存百分比%% %内存百分比%%
     }
 _END
 
