@@ -83,7 +83,7 @@ if not exist "%SystemDrive%\Windows\Setup\Set\pandasysstepapi5.flag" (
 )
 
 :copytags
-echo 拷贝相关TAG文件
+echo 拷贝相关 TAG 文件
 mkdir "%SystemDrive%\Windows\Setup\"
 for %%a in (C D E F G H) do (
     move /y "%%a:\zjsoft*.txt" "%SystemDrive%\Windows\Setup"
@@ -125,7 +125,7 @@ if exist wandrv2.iso (
     start "" /wait "%~dp0wandrv2\DriveCleaner.exe" /wandrv
     echo wandrv2.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 )
-if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
         if exist "%%a:\PanDaTech\OSC\DriverBackup.7z" (
             echo [OSC]正在导入搜到的驱动备份%%a:\~\DriverBackup.7z...>"%systemdrive%\Windows\Setup\wallname.txt"
@@ -142,7 +142,6 @@ if exist "%SystemDrive%\Windows\Setup\xrsyssearchapi.txt" (
 
 :optimize
 if exist "optimize\start.bat" (
-    echo [OSC]正在优化系统...>"%systemdrive%\Windows\Setup\wallname.txt"
     echo y | start "" /wait /min "optimize\start.bat"
 )
 
@@ -207,7 +206,7 @@ echo [OSC] 正在恢复系统主题...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "themerec\themerec.bat" echo y | start "" /wait /min "themerec\themerec.bat"
 
 :changepcname
-echo 修改机器号
+echo 修改计算机名
 if exist "%SystemDrive%\Windows\Setup\pandasysnopcname.txt" goto changepasswd
 if exist "%SystemDrive%\Windows\Setup\pandasyspcname.txt" (
     set /p pcname=<"%SystemDrive%\Windows\Setup\pandasyspcname.txt"

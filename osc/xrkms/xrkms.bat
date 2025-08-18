@@ -16,7 +16,7 @@ if defined wbox (
     echo !errorlevel!
     if "!errorlevel!"=="2" exit
 ) else (
-    echo 即将激活系统，如果您需要使用自购的授权，请在5s内关掉此窗口！
+    echo 即将激活系统，如果您需要使用自购的授权，请在 5s 内关掉此窗口！
     timeout -t 5 2>nul || ping 127.0.0.1 -n 5 >nul
 )
 

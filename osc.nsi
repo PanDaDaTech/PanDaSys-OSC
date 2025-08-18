@@ -200,11 +200,6 @@ SectionGroup "优化设置"
     FileOpen $0 "$WINDIR\Setup\pandasysnokms.txt" w
     FileClose $0
   SectionEnd
-  Section /o "禁用安装运行库"
-    DetailPrint "正在输出 TAG - pandasysnoruntime..."
-    FileOpen $0 "$WINDIR\Setup\pandasysnoruntime.txt" w
-    FileClose $0
-  SectionEnd
   Section /o "禁用安装主题"
     DetailPrint "正在输出 TAG - pandasysnotheme..."
     FileOpen $0 "$WINDIR\Setup\pandasysnotheme.txt" w
@@ -220,7 +215,7 @@ SectionGroup "优化设置"
     FileOpen $0 "$WINDIR\Setup\pandasysuac.txt" w
     FileClose $0
   SectionEnd
-  Section /o "禁用设置机器名"
+  Section /o "禁用设置计算机名"
     DetailPrint "正在输出 TAG - pandasysnopcname..."
     FileOpen $0 "$WINDIR\Setup\pandasysnopcname.txt" w
     FileClose $0

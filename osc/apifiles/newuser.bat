@@ -119,7 +119,7 @@ goto findok
 
 :oobe
 rem ask pcname
-if not exist "%SystemDrive%\Windows\Setup\pandasyspcname.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "简易 OOBE - 机器名设置" "$input" "请输入您要设置的机器名：^^ - 机器名请勿包含中文/空格；^^ - 目前没有防呆机制，输错后果自负 ^^ - 15s 内未做出反应则保持默认" "%pcname%" /screen /FS^=12 /length:24 /timeout^=15s') do set "pcnameinput=%%a"
+if not exist "%SystemDrive%\Windows\Setup\pandasyspcname.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "简易 OOBE - 计算机名设置" "$input" "请输入您要设置的计算机名：^^ - 计算机名请勿包含中文/空格；^^ - 目前没有防呆机制，输错后果自负 ^^ - 15s 内未做出反应则保持默认" "%pcname%" /screen /FS^=12 /length:24 /timeout^=15s') do set "pcnameinput=%%a"
 rem ask user
 if not exist "%SystemDrive%\Windows\Setup\pandasysnewuser.txt" if not exist "%SystemDrive%\Windows\Setup\pandasysadmin.txt" if exist Winput.exe for /f "tokens=1" %%a in ('Winput.exe "简易 OOBE - 用户创建" "$input" "请输入您要创建的用户名：^^ - 用户名请勿包含中文/标点/空格；^^ - 目前没有防呆机制，输错会导致系统安装失败 ^^ - 15s 内未做出反应则保持默认" "%name%" /screen /FS^=12 /length:24 /timeout^=15') do set "nameinput=%%a"
 rem ask passwd

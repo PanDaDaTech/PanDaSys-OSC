@@ -4,7 +4,7 @@ cd /d "%~dp0"
 
 :regimport
 taskkill /f /im explorer.exe
-echo [OSC]正在导入注册表...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在进行优化 [导入注册表] （1/2）...>"%systemdrive%\Windows\Setup\wallname.txt"
 start "" /wait /min regimporter.bat
 if %osver% GEQ 2 (
     %nsudo% -U:T -P:E -wait regimporter.bat
@@ -282,11 +282,6 @@ if %osver% GEQ 4 (
     schtasks /change /tn "\Microsoft\Windows\Media Center\mcupdate" /disable 
 )
 
-echo [OSC] 正在清理浏览器设置并优化 MS Edge 配置文件...>"%systemdrive%\Windows\Setup\wallname.txt"
-if exist "FUCKBrowserConfig.bat" start "" /wait /min "FUCKBrowserConfig.bat" /s
-if exist "bookmarks.exe" start "" /wait /min "bookmarks.exe"
-start explorer.exe
-
 if %osver% GEQ 4 (
     for /f "tokens=6 delims=[]. " %%a in ('ver') do set bigversion=%%a
     for /f "tokens=7 delims=[]. " %%b in ('ver') do set smallversion=%%b
@@ -300,4 +295,9 @@ if %osver% GEQ 4 (
         )
     )
 )
+
+echo [OSC] 正在进行优化 [清理浏览器配置文件并优化 Edge 配置] （2/2）...>"%systemdrive%\Windows\Setup\wallname.txt"
+if exist "FUCKBrowserConfig.bat" start "" /wait /min "FUCKBrowserConfig.bat" /s
+if exist "EdgeFirstRun.exe" start "" /wait /min "EdgeFirstRun.exe"
+start explorer.exe
 exit
