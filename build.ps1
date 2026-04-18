@@ -81,11 +81,18 @@ function Get-LanzouFile {
 }
 
 # 检查
-Write-Host "version: $env:GITHUB_WORKFLOW_VERSION"
-if (-not (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe")) {
+if (Test-Path "$env:NSISDIR\makensis.exe") {
+    $nsisDir = "$env:NSISDIR"
+}
+elseif (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe") {
+    $nsisDir = "C:\Program Files (x86)\NSIS"
+}
+else {
     Write-Host "Cannot find nsis!"
     exit 1
 }
+Write-Host "version: $env:GITHUB_WORKFLOW_VERSION"
+Write-Host "nsisDir: $nsisDir"
 else {
     # 下载所需文件
     Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/bb28b9686ffcacb2876588c53377c00a.cmd" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
@@ -96,12 +103,18 @@ else {
     Invoke-RobustRequest -Uri "https://pan.qzyun.net/f/MlLjf0/oscoffline.bat" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
 }
 
+# 验证文件
+Test-SHA256 -Hashes @{
+    "osc\xrkms\KMS_VL_ALL_AIO.cmd" = "FB229FDCBA766AC801C635CF398ACA3158B25A659FBB7326946E951B5ED0EACA"
+    "osc\xrkms\HEU.exe"            = "E620CFD753DE732F24A163C46CDD48A20F5933D32C5BBDA9DF57EA51AE5C5B38"
+}
+
 # 构建
 if (-not $env:GITHUB_WORKFLOW_VERSION) {
     $env:GITHUB_WORKFLOW_VERSION = "2.6.0.0"
 }
 Set-Content -Path "osc\apifiles\Version.txt" -Value $env:GITHUB_WORKFLOW_VERSION
-& "C:\Program Files (x86)\NSIS\makensis.exe" /V4 /DCUSTOM_VERSION=$env:GITHUB_WORKFLOW_VERSION "osc.nsi" || exit 1
+& "$nsisDir\makensis.exe" /V4 /DCUSTOM_VERSION=$env:GITHUB_WORKFLOW_VERSION "osc.nsi" || exit 1
 
 $env:GITHUB_WORKFLOW_VERSION | Out-File -FilePath "osc.exe.ver"
 (Get-FileHash -Path "osc.exe" -Algorithm SHA256).Hash | Out-File -FilePath "osc.exe.sha256"
