@@ -32,6 +32,7 @@ Get-AppxProvisionedPackage -Online | Where-Object {$_.packagename -like "*Micros
 Get-AppxProvisionedPackage -Online | Where-Object {$_.packagename -like "*Microsoft.WidgetsPlatformRuntime*"} | Remove-AppxProvisionedPackage -Online
 Get-AppxProvisionedPackage -Online | Where-Object {$_.packagename -like "*Microsoft.Windows.DevHome*"} | Remove-AppxProvisionedPackage -Online
 Get-AppxProvisionedPackage -Online | Where-Object {$_.packagename -like "*Microsoft.windowscommunicationsapps*"} | Remove-AppxProvisionedPackage -Online
+Get-AppxProvisionedPackage -Online | Where-Object {$_.packagename -like "*Microsoft.Edge.GameAssist*"} | Remove-AppxProvisionedPackage -Online
 
 # Uninstall Appx for the current user
 # Remove-AppxPackage cmdlet removes an app package from a user account.
@@ -42,7 +43,7 @@ Get-AppxPackage *Microsoft.BingNews* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.GetHelp* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.Getstarted* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.Microsoft3DViewer* -AllUsers | Remove-AppxPackage
-Get-AppxPackage *Microsoft.MicrosoftPCManager* -AllUsers | Remove-AppxPackage # 微软电脑管家
+Get-AppxPackage *Microsoft.MicrosoftPCManager* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.MicrosoftTeams* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.MixedReality.Portal* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.Office.OneNote* -AllUsers | Remove-AppxPackage
@@ -64,10 +65,19 @@ Get-AppxPackage *Microsoft.WidgetsPlatformRuntime* -AllUsers | Remove-AppxPackag
 Get-AppxPackage *Microsoft.Windows.DevHome* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.BingWeather* -AllUsers | Remove-AppxPackage
 Get-AppxPackage *Microsoft.windowscommunicationsapps* -AllUsers | Remove-AppxPackage  # 邮件和日历
-Get-AppxPackage *Microsoft.MicrosoftOfficeHub* -AllUsers | Remove-AppxPackage # Office UWP 客户端，已停止服务
-Get-AppxPackage *Microsoft.Edge.GameAssist* -AllUsers | Remove-AppxPackage  # 游戏助手（结果待测）
-Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* -AllUsers | Remove-AppxPackage # 蜘蛛纸牌
-Get-AppxPackage *Microsoft.MicrosoftStickyNotes* -AllUsers | Remove-AppxPackage # 便签
+Get-AppxPackage *Microsoft.Edge.GameAssist* -AllUsers | Remove-AppxPackage  # 邮件和日历
+Get-AppxPackage *Microsoft.MicrosoftOfficeHub* -AllUsers | Remove-AppxPackage # Microsoft 365 Copilot
+Get-AppxPackage *Microsoft.Copilot* -AllUsers | Remove-AppxPackage # Copilot
+Get-AppxPackage *Microsoft.StartExperiencesApp* -AllUsers | Remove-AppxPackage # “开始体验”应用
+Get-AppxPackage *Microsoft.BingSearch* -AllUsers | Remove-AppxPackage # BingSearch
+# Get-AppxPackage *Microsoft.GamingApp* -AllUsers | Remove-AppxPackage
+# Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* -AllUsers | Remove-AppxPackage
+# Get-AppxPackage *Microsoft.MicrosoftStickyNotes* -AllUsers | Remove-AppxPackage
+# Get-AppxPackage *Microsoft.Todos* -AllUsers | Remove-AppxPackage
+# Get-AppxPackage *Microsoft.WindowsFeedbackHub* -AllUsers | Remove-AppxPackage
+# Get-AppxPackage *Microsoft.Xbox* -AllUsers | Remove-AppxPackage
+# Get-AppxPackage *Microsoft.YourPhone* -AllUsers | Remove-AppxPackage
+# Get-AppxPackage *MicrosoftCorporationII.QuickAssist* -AllUsers | Remove-AppxPackage
 
 # Import registry to disable Microsoft PC Manager
 reg.exe import .\mspcmgr.reg /reg:32

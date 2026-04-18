@@ -8,6 +8,7 @@ if exist "%systemdrive%\Windows\SysWOW64\wscript.exe" (
     move /y "%~dp0apifiles\PECMD64.exe" "%~dp0apifiles\PECMD.exe"
     move /y "%~dp0apifiles\DrvIndex64.exe" "%~dp0apifiles\DrvIndex.exe"
 )
+set aria="%~dp0aria2c.exe" -c -R --retry-wait=5 --check-certificate=false --save-not-found=false --always-resume=false --auto-save-interval=10 --auto-file-renaming=false --allow-overwrite=true
 set dmi="%~dp0apifiles\DMI.exe"
 set netuser="%~dp0apifiles\NetUser.exe"
 set nircmd="%~dp0apifiles\nircmd.exe"
@@ -69,8 +70,7 @@ if %osver% GEQ 3 (
     reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v WindowsMasterSetup /f
     rd /s /q "%CommonProgramFiles%\microsoft shared\ClickToRun\OnlineInteraction"
     echo noway>"%CommonProgramFiles%\microsoft shared\ClickToRun\OnlineInteraction"
-)
-
+    
 echo 创建 runonce 自删清理脚本...
 if %osver% GEQ 2 (
 	copy /y runonce.bat "%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Startup\"
@@ -91,6 +91,31 @@ for %%a in (C D E F G H) do (
     move /y "%%a:\pandasys*.txt" "%SystemDrive%\Windows\Setup"
 )
 
+:FuckVBS
+if exist "%systemdrive%\Windows\Setup\pandasysfkvbs.txt" (
+    if %osver% GEQ 3 (
+        echo [OSC] 正在强制禁用 VBS 及内存完整性检查...（可能需要几分钟的时间）
+        DISM.exe /Online /Disable-Feature:Containers-DisposableClientVM /NoRestart
+        DISM.exe /Online /Disable-Feature:VirtualMachinePlatform /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-Clients /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Services /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Hypervisor /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-PowserShell /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Tools-All /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V /NoRestart
+        DISM.exe /Online /Disable-Feature:HypervisorPlatform /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Online /NoRestart
+        DISM.exe /Online /Disable-Feature:IsolatedUserMode /NoRestart
+
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" /f /v "enabled" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "RequirePlatformSecurityFeatures" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "EnableVirtualizationBasedSecurity" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "SecureBiometrics" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "WindowsHello" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Services\HvHost" /f /v "Start" /t REG_DWORD /d 4
+    )
+)
+
 :oscdrivers
 echo 电源选项设置
 powercfg /h off
@@ -108,23 +133,7 @@ rem [磁盘电源不关闭]
 powercfg setactive SCHEME_BALANCED && powercfg -x -disk-timeout-ac 0
 powercfg setactive SCHEME_MAX && powercfg -x -disk-timeout-ac 0
 powercfg setactive SCHEME_MIN && powercfg -x -disk-timeout-ac 0
-rem 安装驱动
-if exist wandrv.iso (
-    echo [OSC]正在应用万能驱动 wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
-    md wandrv
-    move /y "%~dp0wandrv.iso" "%~dp0wandrv\wandrv.iso"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv\DriveCleaner.exe"
-    start "" /wait "%~dp0wandrv\DriveCleaner.exe" /wandrv
-    echo wandrv.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-)
-if exist wandrv2.iso (
-    echo [OSC]正在应用万能驱动 wandrv2.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
-    md wandrv2
-    move /y "%~dp0wandrv2.iso" "%~dp0wandrv2\wandrv.iso"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv2\DriveCleaner.exe"
-    start "" /wait "%~dp0wandrv2\DriveCleaner.exe" /wandrv
-    echo wandrv2.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-)
+
 if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     for %%a in (C D E F G H) do (
         if exist "%%a:\PanDaTech\OSC\DriverBackup.7z" (
@@ -143,62 +152,6 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 :optimize
 if exist "optimize\start.bat" (
     echo y | start "" /wait /min "optimize\start.bat"
-)
-
-:powercfg
-echo 电源处理
-set notebook=0
-echo wxp-11判断是否为笔记本电脑
-if exist "%SystemDrive%\Windows\System32\wbem\WMIC.exe" (
-    for /f "tokens=2 delims={}" %%a in ('wmic PATH Win32_SystemEnclosure get ChassisTypes /value') do (
-        if %%a GEQ 8 (
-            for /f "tokens=2 delims==" %%b in ('wmic path Win32_Battery get BatteryStatus /value') do (
-                if %%b GEQ 1 set notebook=1
-            )
-        )
-    )
-) else (
-    if defined PSModulePath (
-        for /f "tokens=*" %%a in ('PowerShell "(Get-WmiObject Win32_SystemEnclosure).ChassisTypes"') do (
-            if %%a GEQ 8 (
-                for /f "tokens=*" %%b in ('PowerShell "(Get-WmiObject Win32_Battery).BatteryStatus"') do (
-                    if %%b GEQ 1 set notebook=1
-                )
-            )
-        )
-    )
-)
-
-rem 针对品牌机 MoDT，去除识别笔记本内容
-if exist "%SystemDrive%\Windows\Setup\zjsoftspoem.txt" set notebook=0
-
-echo 防缩肛
-powercfg setactive SCHEME_BALANCED
-
-if %notebook% GEQ 1 (
-    echo 笔记本启用休眠
-    powercfg /h on
-    echo 笔记本禁用小键盘
-    reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t REG_SZ /d 0 /f
-    echo 笔记本开启自动息屏
-    POWERCFG /x monitor-timeout-dc 5
-    POWERCFG /x standby-timeout-dc 30
-    echo 笔记本开启快速启动
-    reg add "HKLM\SYSTEM\ControlSet001\Control\Session Manager\Power" /v "HiberbootEnabled" /t REG_DWORD /d 1 /f
-    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v "HiberbootEnabled" /t REG_DWORD /d 1 /f
-) else (
-    echo 台式机开启小键盘
-    reg add "HKCU\Control Panel\Keyboard" /v "InitialKeyboardIndicators" /t REG_SZ /d 2 /f
-    echo 电源按钮功能设置为关机
-    powercfg -setdcvalueindex SCHEME_MAX SUB_BUTTONS PBUTTONACTION 3
-    powercfg -setacvalueindex SCHEME_MAX SUB_BUTTONS PBUTTONACTION 3
-    powercfg -setdcvalueindex SCHEME_MIN SUB_BUTTONS PBUTTONACTION 3
-    powercfg -setacvalueindex SCHEME_MIN SUB_BUTTONS PBUTTONACTION 3
-    powercfg -setdcvalueindex SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 3
-    powercfg -setacvalueindex SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 3
-    echo 禁用USB选择性暂停
-    powercfg -setdcvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
-    powercfg -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
 )
 
 :themerec
@@ -261,30 +214,6 @@ if exist "%systemdrive%\Windows\Setup\pandasyspasswd.txt" (
 )
 endlocal
 
-:restorewifi
-echo 还原备份的 WIFI 密码
-if %osver% GEQ 2 (
-    for %%a in (C D E F G H) do (
-        if exist "%%a:\PanDaTech\WLANPassword\*.xml" (
-            FORFILES /P "%%a:\PanDaTech\WLANPassword" /M *.xml /C "cmd /c netsh wlan add profile filename=@path"
-        )
-        if exist "%%a:\WLANPassword\*.xml" (
-            FORFILES /P "%%a:\WLANPassword" /M *.xml /C "cmd /c netsh wlan add profile filename=@path"
-        )
-    )
-) else (
-    for /f "tokens=1,2" %%i in ('%wlan% ei') DO (
-        if "%%i"=="GUID:" (
-            set GUID=%%j
-            for %%a in (C D E F G H) do (
-                for %%b in ("%%a:\PanDaTech\WLANPassword\*.xml") DO (
-                    %wlan% sp !GUID! "%%b"
-                )
-            )
-        )
-    )
-)
-
 :restoreip
 setlocal enabledelayedexpansion
 if exist "%systemdrive%\Windows\Setup\pandasysnodhcp.txt" (
@@ -299,7 +228,6 @@ if exist "%systemdrive%\Windows\Setup\pandasysnodhcp.txt" (
     )
 )
 endlocal
-
 
 :configurefirewall
 if exist "%systemdrive%\Windows\Setup\pandasysfirewall.txt" (
@@ -409,6 +337,11 @@ if exist "xrkms\xrkms.bat" (
     echo y | start "" /wait "xrkms\xrkms.bat"
 )
 
+:osconline
+echo 应用OSConline
+echo [OSC]正在应用OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
+if exist "online.bat" echo y | start "" /wait /min "online.bat"
+
 :oscapis2
 echo 应用 OSC-API2
 if exist "%SystemDrive%\Windows\Setup\Run\2\api2.bat" (
@@ -457,56 +390,6 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 
 :afterlife
 echo [OSC] 正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
-
-echo 关闭 Edge OneDrive
-if %osver% GEQ 4 (
-    taskkill /f /im msedge.exe
-    taskkill /f /im msedgewebview2.exe
-    taskkill /f /im MicrosoftEdgeUpdate.exe
-    taskkill /f /im onedrive.exe
-    taskkill /f /im onedrivesetup.exe
-)
-
-echo 尝试卸载 OneDrive
-for /d %%f in ("%localappdata%\Microsoft\OneDrive\*") do (if exist "%%f\OneDriveSetup.exe" "%%f\OneDriveSetup.exe" /uninstall)
-
-echo 关闭 OneDrive 开机自启
-reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
-reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
-del /f /q "%SystemDrive%\Windows\System32\Tasks\OneDrive*"
-
-echo 干掉 OneDrive 资源菜单
-for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
-for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
-
-echo 删除 OneDrive 残留
-if not exist "%USERPROFILE%\Appdata\Local\Microsoft\OneDrive\OneDrive.exe" (
-del /f /q "%AppData%\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk"
-rd /s /q "%USERPROFILE%\OneDrive"
-rd /s /q "%LocalAppData%\Microsoft\OneDrive"
-rd /s /q "%ProgramData%\Microsoft OneDrive"
-rd /s /q "%SystemDrive%\OneDriveTemp"
-reg delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
-reg delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
-
-echo 关闭驱动面板开机自启
-reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v RTHDVCPL /f
-reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v HotKeysCmds /f
-
-echo 解决 Office 2016 以下版本中文未知字体难看的问题
-reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" /v "Arial Unicode MS (TrueType)" /f
-del /f /q "%SystemDrive%\Windows\Fonts\ARIALUNI.TTF"
-
-echo 清理重复的浏览器图标
-if exist "%PUBLIC%\Desktop\Microsoft Edge.lnk" (
-    if exist "%USERPROFILE%\Desktop\Microsoft Edge.lnk" del /f /q "%USERPROFILE%\Desktop\Microsoft Edge.lnk"
-) else if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" (
-    copy /y "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" "%PUBLIC%\Desktop\Microsoft Edge.lnk"
-)
-
-echo 输出 TAG
-del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.exe"
-del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.vbs"
 
 if %osver% EQU 2 (
     echo Win7 系统 WU 服务处理

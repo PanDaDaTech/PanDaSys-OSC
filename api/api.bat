@@ -68,13 +68,10 @@ if %osver% GEQ 3 (
     echo 关闭保留储存
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
     
-    echo 提前删除 OneDriveSetup.exe (From:月下)
-    ForFiles /P "%SystemRoot%\System32" /M OneDrive* /C "cmd /c Del /S /Q @path"
-    ForFiles /P "%SystemRoot%\SysWOW64" /M OneDrive* /C "cmd /c Del /S /Q @path"
-    
     echo 处理 OneDriveSetup 开机启动项
     reg delete HKU\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
     reg delete HKU\.DEFAULT\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
+    SCHTASKS /Change /DISABLE /TN "\Microsoft\OneDrive\OneDrive Per-Machine First Setup Task"
     
     echo 禁止自动安装微软电脑管家
     rd /s /q "%ProgramData%\Windows Master Store"
@@ -91,6 +88,7 @@ if %osver% GEQ 3 (
     reg add "HKU\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\CloudExperienceHost\Intent\PersonalDataExport" /f /v "PDEShown" /t REG_DWORD /d 2
     
     echo 避免自动安装 Outlook、DevHome、微软电脑管家、MS Edge 游戏助手
+	reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\CrossDeviceUpdate" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Deprovisioned\Microsoft.OutlookForWindows_8wekyb3d8bbwe" /f
     reg delete "HKLM\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\OutlookUpdate" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Deprovisioned\Microsoft.Windows.DevHome_8wekyb3d8bbwe" /f
@@ -100,6 +98,13 @@ if %osver% GEQ 3 (
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Deprovisioned\Microsoft.Edge.GameAssist_8wekyb3d8bbwe" /f
 )
 
+:: 禁用 UCPD 驱动
+if exist "%SystemDrive%\Windows\System32\drivers\ucpd.sys" (
+    echo 禁用 UCPD 驱动
+    sc stop ucpd
+    sc config ucpd start= disabled
+    schtasks /delete /tn "\Microsoft\Windows\AppxDeploymentClient\UCPD velocity" /f
+)
 if not exist "%SystemDrive%\Windows\Setup\Scripts\ispandasys.txt" rd /s /q "%SystemDrive%\Windows\Setup\Scripts"
 
 :: 扩展分区...
@@ -148,63 +153,8 @@ if exist "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe" (
     echo [API] 正在应用驱动总裁...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe"
     echo %SystemDrive%\WINDOWS\WinDrive\DcLoader.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-) else if exist "%SystemDrive%\WINDOWS\WinDrive\SDI*.exe" (
-    for %%a in ("%SystemDrive%\WINDOWS\WinDrive\SDI*.exe") do (
-        if /i "PROCESSOR_ARCHITECTURE"=="AMD64" (
-            echo %%~na | find /i "64" && (
-                echo [API]正在应用 Snappy Driver Installer x64...>"%systemdrive%\Windows\Setup\wallname.txt"
-                echo %%a>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-            )
-        )
-        if /i "PROCESSOR_ARCHITECTURE"=="x86" (
-            echo %%~na | find /i "64" || (
-                echo [API]正在应用 Snappy Driver Installer x86...>"%systemdrive%\Windows\Setup\wallname.txt"
-                echo %%a>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-            )
-        )  
-    )
-) else if exist "%SystemDrive%\WINDOWS\WinDrive\*.ini" (
-    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe"
-    start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\WINDOWS\WinDrive\*.ini>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-) else if exist "%SystemDrive%\Sysprep\Drivers\*.ini" (
-    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\Drivers\DriveCleaner.exe"
-    start "" /wait "%SystemDrive%\Sysprep\Drivers\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\Drivers\*.ini>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-) else if exist "%SystemDrive%\Sysprep\drvceo.ini" (
-    echo [API] 正在应用驱动总裁...>"%systemdrive%\Windows\Setup\wallname.txt"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
-    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\drvceo.ini>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-) else if exist "%SystemDrive%\Sysprep\wandr*.exe" (
-    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
-    for %%a in (%SystemDrive%\Sysprep\wandr*.exe) do move /y "%%a" "%%~dpawandrv.exe"
-    for %%a in (%SystemDrive%\Sysprep\wandr*.ini) do move /y "%%a" "%%~dpawandrv.ini"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
-    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\wandr*.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-) else if exist "%SystemDrive%\Sysprep\*wandrv6.exe" (
-    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
-    for %%a in (%SystemDrive%\Sysprep\*wandrv6.exe) do move /y "%%a" "%%~dpawandrv.exe"
-    for %%a in (%SystemDrive%\Sysprep\*wandrv6.ini) do move /y "%%a" "%%~dpawandrv.ini"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
-    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\*wandrv6.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-) else if exist "%SystemDrive%\Sysprep\easydr*.exe" (
-    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
-    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\Sysprep\easydr*.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-) else if exist "%SystemDrive%\wandrv\wandrv.exe" (
-    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
-    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\wandrv\DriveCleaner.exe"
-    start "" /wait "%SystemDrive%\wandrv\DriveCleaner.exe" /wandrv
-    echo %SystemDrive%\wandrv\wandrv.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
 )
+
 if exist wandrv.iso (
     echo [API] 正在应用万能驱动 wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
     rd /s /q "%SystemDrive%\WINDOWS\WinDrive\"
@@ -296,16 +246,43 @@ ver | find "10.0.10" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 if %osver% LEQ 3 if %osver% GEQ 2 echo y | start "" /min /wait "%~dp0apifiles\EOSNotify.bat"
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
+    rem 尝试使用官方方式处理 Windows Defender 服务，以便禁用生效
+    Dism /online /Disable-Feature /featurename:Windows-Defender-ApplicationGuard
+    Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions 
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
     start "" /wait /min "%~dp0apifiles\Wub.exe" /D /P
-    echo 关闭 VBS 基于虚拟化的安全性
-    bcdedit /set hypervisorlaunchtype off
+    
+    if exist "%systemdrive%\Windows\Setup\pandasysfkvbs.txt" (
+        echo 强制禁用 VBS 及内存完整性检查
+        DISM.exe /Online /Disable-Feature:Containers-DisposableClientVM /NoRestart
+        DISM.exe /Online /Disable-Feature:VirtualMachinePlatform /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-Clients /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Services /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Hypervisor /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-PowserShell /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Tools-All /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V /NoRestart
+        DISM.exe /Online /Disable-Feature:HypervisorPlatform /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Online /NoRestart
+        DISM.exe /Online /Disable-Feature:IsolatedUserMode /NoRestart
+
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" /f /v "enabled" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "RequirePlatformSecurityFeatures" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "EnableVirtualizationBasedSecurity" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "SecureBiometrics" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "WindowsHello" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Services\HvHost" /f /v "Start" /t REG_DWORD /d 4
+    ) else (
+        bcdedit /set hypervisorlaunchtype off
+    )
+
     echo 关闭显示首次登录动画
     reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f
+
     echo 禁用 BitLocker 自动加密
     reg add "HKLM\SYSTEM\CurrentControlSet\BitLocker" /v "PreventDeviceEncryption" /t REG_DWORD /d 1 /f 
 )
@@ -410,28 +387,6 @@ if %osver% GEQ 4 (
     taskkill /f /im onedrivesetup.exe
 )
 
-echo 尝试卸载 OneDrive
-for /d %%f in ("%localappdata%\Microsoft\OneDrive\*") do (if exist "%%f\OneDriveSetup.exe" "%%f\OneDriveSetup.exe" /uninstall)
-
-echo 关闭 OneDrive 开机自启
-reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDrive /f
-reg delete HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run /v OneDriveSetup /f
-del /f /q "%SystemDrive%\Windows\System32\Tasks\OneDrive*"
-
-echo 干掉 OneDrive 资源菜单
-for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
-for /f "tokens=*" %%a in ('reg query HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace /s /f onedrive ^| find /i "HKEY_CURRENT_USER"') do reg delete "%%a" /f
-
-echo 删除 OneDrive 残留
-if not exist "%USERPROFILE%\Appdata\Local\Microsoft\OneDrive\OneDrive.exe" (
-del /f /q "%AppData%\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk"
-rd /s /q "%USERPROFILE%\OneDrive"
-rd /s /q "%LocalAppData%\Microsoft\OneDrive"
-rd /s /q "%ProgramData%\Microsoft OneDrive"
-rd /s /q "%SystemDrive%\OneDriveTemp"
-reg delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
-reg delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f
-
 echo 修复双用户问题
 if /i not "%USERNAME%"=="Administrator" (
     NET USER Administrator /ACTIVE:NO
@@ -522,14 +477,6 @@ if %osver% GEQ 3 (
     echo Win8-11 系统 WU 驱动处理
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-enable.reg"
 )
-
-echo 清理重复的浏览器图标
-if exist "%PUBLIC%\Desktop\Microsoft Edge.lnk" (
-    if exist "%USERPROFILE%\Desktop\Microsoft Edge.lnk" del /f /q "%USERPROFILE%\Desktop\Microsoft Edge.lnk"
-) else if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" (
-    copy /y "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" "%PUBLIC%\Desktop\Microsoft Edge.lnk"
-)
-if exist "%PUBLIC%\Desktop\Google Chrome.lnk" if exist "%USERPROFILE%\Desktop\Google Chrome.lnk" del /f /q "%USERPROFILE%\Desktop\Google Chrome.lnk"
 
 echo 输出 TAG
 del /f /s /q "%SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\*.exe"

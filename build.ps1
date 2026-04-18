@@ -4,56 +4,55 @@ $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
 
 # 下载文件
-function Get-LanzouLink {
-    param(
-        [Parameter(Mandatory = $true, Position = 0)]
-        [string]
-        $Uri
+function Test-Hashes {
+    param (
+        [hashtable]$Hashes,
+        [string]$Algorithm
     )
-    $sharekey = $Uri -split '/' | Select-Object -Last 1
-    if ((Invoke-RestMethod -Uri "https://lanzoui.com/$sharekey") -match 'src="(\/fn\?.\w+)') {
-        $fn = Invoke-RestMethod -Uri ('https://lanzoui.com/' + $Matches[1])
-    }
-    else {
-        throw "Failed to get fn. Please check whether the URL is correct."
-    }
-    if ($fn -match '\/ajaxm\.php\?file=\d\d+') {
-        $ajaxm = $Matches[0]
-    }
-    else {
-        throw "Failed to get ajaxm.php."
-    }
-    if ($fn -match "wp_sign = '(.*?)';") {
-        $sign = $Matches[1]
-    }
-    else {
-        throw "Failed to get sign."
-    }
-    $ajax = Invoke-RestMethod -Uri ('https://lanzoui.com/' + $ajaxm) -Method Post `
-        -Headers @{ referer = "https://lanzoui.com/" } `
-        -Body @{ 'action' = 'downprocess'; 'signs' = '?ctdf'; 'sign' = $sign; 'kd' = '1' }
-    $directlink = $ajax.dom + '/file/' + $ajax.url
-    try {
-        Invoke-WebRequest -Uri $directlink -Method Head -MaximumRedirection 0 -ErrorAction SilentlyContinue `
-            -Headers @{ 
-                'accept' = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'
-                'accept-encoding' = 'gzip, deflate, br, zstd'
-                'accept-language' = 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6'
-                'priority' = 'u=0, i'
-                'upgrade-insecure-requests' = '1'
-             } 
-    }
-    catch {
-        $directlink = $_.Exception.Response.Headers.Location.OriginalString
-    }
-    Write-Host -ForegroundColor Yellow "Direct Link of $sharekey is: $directlink"
-    if ($directlink) {
-        return $directlink
-    }
-    else {
-        throw "Failed to get direct link."
+    return $Hashes.GetEnumerator() | ForEach-Object {
+        $file = $_.Key
+        $expectedHash = $_.Value
+        Write-Host -ForegroundColor Blue "Verifying $file $Algorithm hash ..."
+        Write-Host -ForegroundColor Gray "Expected: $expectedHash"
+        $actualHash = (Get-FileHash -Path $file -Algorithm $Algorithm).Hash
+        Write-Host -ForegroundColor Gray "Actual  : $actualHash"
+        if ($actualHash -ne $expectedHash) {
+            # return $false
+            Write-Error "$file hash not match."
+        }
+        else {
+            Write-Host -ForegroundColor Green "$file hash match."
+        }
     }
 }
+function Test-SHA256 ([hashtable]$Hashes) { return Test-Hashes -Hashes $Hashes -Algorithm "SHA256" }
+
+function Invoke-RobustRequest {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Uri,
+        [Parameter(Mandatory = $true)]
+        [string]$OutFile
+    )
+    if ([string]::IsNullOrWhiteSpace($Uri)) {
+        throw "URL cannot be null or empty! OutFile: $OutFile"
+    }
+
+    for ($retry = 1; $retry -le 3; $retry++) {
+        try {
+            Invoke-WebRequest -Uri $Uri -OutFile $OutFile -ConnectionTimeoutSeconds 5 -AllowInsecureRedirect
+            return
+        }
+        catch {
+            if ($retry -eq 3) {
+                throw "Failed after 3 retries! URL: '$Uri', Error: $_"
+            }
+            Write-Host "Retry $retry failed for '$Uri', trying again ($retry / 3)... Error: $_"
+            Start-Sleep -Seconds 2
+        }
+    }
+}
+    
 function Get-LanzouFile {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
@@ -64,32 +63,19 @@ function Get-LanzouFile {
         [string]
         $OutFile
     )
+    
     Write-Host "Downloading $Uri to $OutFile..."
     try {
-        Write-Host "Using PowerShell Function to parse link..."
-        $directlink = Get-LanzouLink -Uri $Uri
-        Invoke-WebRequest -Uri $directlink -OutFile $OutFile -ConnectionTimeoutSeconds 5 -AllowInsecureRedirect
+        Write-Host "Using api.xrgzs.top to parse link..."
+        Invoke-RobustRequest -Uri "https://api.xrgzs.top/sdlp/lanzou/?type=down&url=$Uri" -OutFile $OutFile
     }
     catch {
-        Write-Warning "PowerShell Function faild: $_"
         try {
-            Write-Host "Using api.xrgzs.top to parse link..."
-            Invoke-WebRequest -Uri "https://api.xrgzs.top/lanzou/?type=down&url=$Uri" -OutFile $OutFile -ConnectionTimeoutSeconds 5 -AllowInsecureRedirect
+            Write-Host "Using lz.qaiu.top to parse link..."
+            Invoke-RobustRequest -Uri "https://lz.qaiu.top/parser?url=$Uri" -OutFile $OutFile
         }
         catch {
-            try {
-                Write-Host "Using api.hanximeng.com to parse link..."
-                Invoke-WebRequest -Uri "https://api.hanximeng.com/lanzou/?type=down&url=$Uri" -OutFile $OutFile -ConnectionTimeoutSeconds 5 -AllowInsecureRedirect
-            }
-            catch {
-                try {
-                    Write-Host "Using lz.qaiu.top to parse link..."
-                    Invoke-WebRequest -Uri "https://lz.qaiu.top/parser?url=$Uri" -OutFile $OutFile -ConnectionTimeoutSeconds 5 -AllowInsecureRedirect
-                }
-                catch {
-                    Write-Error "Failed to download $Uri. ($_)"
-                }
-            }
+            Write-Error "Failed to download $Uri. ($_)"
         }
     }
 }
@@ -102,8 +88,12 @@ if (-not (Test-Path "C:\Program Files (x86)\NSIS\makensis.exe")) {
 }
 else {
     # 下载所需文件
-    Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/idHOf2bfs3te" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
-    Get-LanzouFile -Uri "https://xrgzs.lanzoum.com/iIse82yindri" -OutFile "osc\xrkms\kms.exe"
+    Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/bb28b9686ffcacb2876588c53377c00a.cmd" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
+    Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/34da2d71a5be6387f8289adec141fd54.exe" -OutFile "osc\xrkms\HEU.exe"
+    Invoke-RobustRequest -Uri "https://raw.githubusercontent.com/massgravel/Microsoft-Activation-Scripts/refs/heads/master/MAS/Separate-Files-Version/Activators/TSforge_Activation.cmd" -OutFile "osc\xrkms\TSforge_Activation.cmd"
+
+    # 下载其他文件
+    Invoke-RobustRequest -Uri "https://pan.qzyun.net/f/MlLjf0/oscoffline.bat" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
 }
 
 # 构建

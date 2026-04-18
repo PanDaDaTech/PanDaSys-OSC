@@ -16,18 +16,18 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
-    - name: Change DNS Server
-      shell: pwsh
-      run: |
-        $newDnsServers = @('1.1.1.1', '8.8.8.8')
-        $networkAdapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
-        foreach ($adapter in $networkAdapters) {
-            Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ResetServerAddresses
-            Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ServerAddresses $newDnsServers
-        }
-        ipconfig /flushdns
+    # - name: Change DNS Server
+    #   shell: pwsh
+    #   run: |
+    #     $newDnsServers = @('1.1.1.1', '8.8.8.8')
+    #     $networkAdapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+    #     foreach ($adapter in $networkAdapters) {
+    #         Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ResetServerAddresses
+    #         Set-DnsClientServerAddress -InterfaceIndex $adapter.ifIndex -ServerAddresses $newDnsServers
+    #     }
+    #     ipconfig /flushdns
 
     # - name: Install Cloudflare WRAP
     #   shell: pwsh
@@ -69,10 +69,11 @@ jobs:
         echo $GITHUB_OUTPUT
         echo "version=$version" >> $env:GITHUB_OUTPUT
 
-    # - name: Install NSIS
-    #   uses: repolevedavaj/install-nsis@v1.0.1
-    #   with:
-    #     nsis-version: 3.09
+    - name: Install NSIS
+      shell: pwsh
+      run: |
+        Write-Host "Installing NSIS..."
+        choco install nsis -y
 
     - name: Build PanDaSys-OSC
       shell: pwsh
@@ -88,7 +89,7 @@ jobs:
     #     .\warp-cli.exe disconnect
   
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: PanDaSys_OSC_CI_Build_v${{ steps.generate_version.outputs.version }}
         path: |
@@ -97,3 +98,4 @@ jobs:
             osc.exe.sha256
             osc.exe.md5
         compression-level: 0
+
