@@ -93,6 +93,7 @@ else {
 }
 Write-Host "version: $env:GITHUB_WORKFLOW_VERSION"
 Write-Host "nsisDir: $nsisDir"
+
 else {
     # 下载所需文件
     Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/bb28b9686ffcacb2876588c53377c00a.cmd" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
