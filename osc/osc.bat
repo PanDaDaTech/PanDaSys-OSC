@@ -57,7 +57,9 @@ if /i "%SystemDrive%"=="x:" if exist "X:\Windows\System32\PECMD.EXE" (
 if %osver% GEQ 3 (
     echo Win8-11 系统 APPX、WD 处理
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
-    regedit /s "%~dp0apifiles\WDDisable.reg"
+    rem 尝试用官方方式禁用 Windows Defender，以便后续可正常使用注册表禁用服务
+    Dism /online /Disable-Feature /featurename:Windows-Defender-ApplicationGuard
+    Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions 
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"
     reg import "%~dp0apifiles\mspcmgr.reg" /reg:32

@@ -40,14 +40,14 @@ if exist cdrive.rar (
     del /f /q cdrive.rar
 )
 :choose
-if "%1"=="/1" goto bsq
-if "%1"=="/2" goto bsz
-if "%1"=="/3" goto bsh
-if "%1"=="/4" goto dls
-if "%1"=="/5" goto jzm
+if "%1"=="/1" goto BeforeDeploy
+if "%1"=="/2" goto InDeploy
+if "%1"=="/3" goto SetupCompete
+if "%1"=="/4" goto FirstLogin
+if "%1"=="/5" goto ToDesktop
 goto end
 
-:bsq
+:BeforeDeploy
 title 部署前系统处理（请勿关闭此窗口）
 mkdir "%SystemDrive%\Windows\Setup"
 start "" "%pecmd%" LOAD "%~dp0apifiles\Wall.wcs"
@@ -130,7 +130,7 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 echo [API] 正在等待 windeploy 进入下一个阶段...>"%systemdrive%\Windows\Setup\wallname.txt"
 goto end
 
-:bsz
+:InDeploy
 title 部署中系统处理（请勿关闭此窗口）
 
 ::应用系统驱动
@@ -228,7 +228,7 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
 )
 goto end
 
-:bsh
+:SetupCompete
 title 部署后系统处理（请勿关闭此窗口）
 echo [API] 正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"
 echo 禁止 Win10 大版本系统更新
@@ -250,7 +250,6 @@ if %osver% GEQ 3 (
     Dism /online /Disable-Feature /featurename:Windows-Defender-ApplicationGuard
     Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions 
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
-    regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
     start "" /wait /min "%~dp0apifiles\Wub.exe" /D /P
@@ -318,13 +317,12 @@ reg delete "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run" /f /
 echo exit>"%systemdrive%\Windows\Setup\wallname.txt"
 goto end
 
-:dls
+:FirstLogin
 title 登录时系统处理（请勿关闭此窗口）
 taskkill /f /im explorer.exe
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
-    regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     echo 关闭保留储存
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
@@ -367,7 +365,7 @@ reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /f /v "PanDaSysAPI"
 shutdown -r -t 0
 goto end
 
-:jzm
+:ToDesktop
 title 桌面环境系统处理（请勿关闭此窗口）
 start "" "%pecmd%" LOAD "%~dp0apifiles\Wall.wcs"
 echo [API]正在进行桌面环境系统处理...>"%systemdrive%\Windows\Setup\wallname.txt"
