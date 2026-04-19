@@ -94,15 +94,13 @@ else {
 Write-Host "version: $env:GITHUB_WORKFLOW_VERSION"
 Write-Host "nsisDir: $nsisDir"
 
-else {
-    # 下载所需文件
-    Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/bb28b9686ffcacb2876588c53377c00a.cmd" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
-    Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/34da2d71a5be6387f8289adec141fd54.exe" -OutFile "osc\xrkms\HEU.exe"
-    Invoke-RobustRequest -Uri "https://raw.githubusercontent.com/massgravel/Microsoft-Activation-Scripts/refs/heads/master/MAS/Separate-Files-Version/Activators/TSforge_Activation.cmd" -OutFile "osc\xrkms\TSforge_Activation.cmd"
+# 下载所需文件
+Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/bb28b9686ffcacb2876588c53377c00a.cmd" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
+Invoke-RobustRequest -Uri "https://nos.netease.com/ysf/34da2d71a5be6387f8289adec141fd54.exe" -OutFile "osc\xrkms\HEU.exe"
+Invoke-RobustRequest -Uri "https://raw.githubusercontent.com/massgravel/Microsoft-Activation-Scripts/refs/heads/master/MAS/Separate-Files-Version/Activators/TSforge_Activation.cmd" -OutFile "osc\xrkms\TSforge_Activation.cmd"
 
-    # 下载其他文件
-    Invoke-RobustRequest -Uri "https://pan.qzyun.net/f/MlLjf0/oscoffline.bat" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
-}
+# 下载其他文件
+Invoke-RobustRequest -Uri "https://pan.qzyun.net/f/MlLjf0/oscoffline.bat" -OutFile "osc\oscoffline.bat" -ErrorAction Stop
 
 # 验证文件
 Test-SHA256 -Hashes @{
