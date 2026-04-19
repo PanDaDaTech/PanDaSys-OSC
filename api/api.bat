@@ -246,7 +246,6 @@ ver | find "10.0.10" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 if %osver% LEQ 3 if %osver% GEQ 2 echo y | start "" /min /wait "%~dp0apifiles\EOSNotify.bat"
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
-    rem 尝试使用官方方式处理 Windows Defender 服务，以便禁用生效
     Dism /online /Disable-Feature /featurename:Windows-Defender-ApplicationGuard
     Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions 
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
