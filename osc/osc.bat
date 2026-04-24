@@ -58,7 +58,7 @@ if %osver% GEQ 3 (
     echo Win8-11 系统 APPX、WD 处理
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     Dism /online /Disable-Feature /featurename:Windows-Defender-ApplicationGuard
-    Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions 
+    Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"
     reg import "%~dp0apifiles\mspcmgr.reg" /reg:32
@@ -71,6 +71,7 @@ if %osver% GEQ 3 (
     reg delete HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v WindowsMasterSetup /f
     rd /s /q "%CommonProgramFiles%\microsoft shared\ClickToRun\OnlineInteraction"
     echo noway>"%CommonProgramFiles%\microsoft shared\ClickToRun\OnlineInteraction"
+)
     
 echo 创建 runonce 自删清理脚本...
 if %osver% GEQ 2 (
@@ -90,31 +91,6 @@ for %%a in (C D E F G H) do (
     move /y "%%a:\zjsoft*.txt" "%SystemDrive%\Windows\Setup"
     move /y "%%a:\pdtechrc*.txt" "%SystemDrive%\Windows\Setup"
     move /y "%%a:\pandasys*.txt" "%SystemDrive%\Windows\Setup"
-)
-
-:FuckVBS
-if exist "%systemdrive%\Windows\Setup\pandasysfkvbs.txt" (
-    if %osver% GEQ 3 (
-        echo [OSC] 正在强制禁用 VBS 及内存完整性检查...（可能需要几分钟的时间）
-        DISM.exe /Online /Disable-Feature:Containers-DisposableClientVM /NoRestart
-        DISM.exe /Online /Disable-Feature:VirtualMachinePlatform /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-Clients /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Services /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Hypervisor /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-PowserShell /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Tools-All /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V /NoRestart
-        DISM.exe /Online /Disable-Feature:HypervisorPlatform /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Online /NoRestart
-        DISM.exe /Online /Disable-Feature:IsolatedUserMode /NoRestart
-
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" /f /v "enabled" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "RequirePlatformSecurityFeatures" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "EnableVirtualizationBasedSecurity" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "SecureBiometrics" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "WindowsHello" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Services\HvHost" /f /v "Start" /t REG_DWORD /d 4
-    )
 )
 
 :oscdrivers
@@ -147,6 +123,31 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
             start "" /wait "%%a:\PanDaTech\OSC\DriveCleaner.exe" /wandrv
             echo %%a:\PanDaTech\OSC\wandrv.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
         )
+    )
+)
+
+:FuckVBS
+if exist "%systemdrive%\Windows\Setup\pandasysfkvbs.txt" (
+    if %osver% GEQ 3 (
+        echo [OSC] 正在强制禁用 VBS 及内存完整性检查...（可能需要几分钟的时间）
+        DISM.exe /Online /Disable-Feature:Containers-DisposableClientVM /NoRestart
+        DISM.exe /Online /Disable-Feature:VirtualMachinePlatform /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-Clients /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Services /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Hypervisor /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-PowserShell /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Tools-All /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V /NoRestart
+        DISM.exe /Online /Disable-Feature:HypervisorPlatform /NoRestart
+        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Online /NoRestart
+        DISM.exe /Online /Disable-Feature:IsolatedUserMode /NoRestart
+
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" /f /v "enabled" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "RequirePlatformSecurityFeatures" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "EnableVirtualizationBasedSecurity" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "SecureBiometrics" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "WindowsHello" /t REG_DWORD /d 0
+        reg add "HKLM\system\ControlSet001\Services\HvHost" /f /v "Start" /t REG_DWORD /d 4
     )
 )
 
@@ -342,52 +343,6 @@ if exist "xrkms\xrkms.bat" (
 echo 应用OSConline
 echo [OSC]正在应用OSConline（可能需要15分钟, 请保持网络通畅）>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "online.bat" echo y | start "" /wait /min "online.bat"
-
-:oscapis2
-echo 应用 OSC-API2
-if exist "%SystemDrive%\Windows\Setup\Run\2\api2.bat" (
-    echo [OSC] 正在应用 DIY 接口 api2.bat ...>"%systemdrive%\Windows\Setup\wallname.txt"
-    start "" /max /wait "%SystemDrive%\Windows\Setup\Run\2\api2.bat"
-)
-for %%b in (%SystemDrive%\Windows\Setup\Run\2\*.exe) do (
-    echo [OSC] 正在安装预装软件 %%b ...>"%systemdrive%\Windows\Setup\wallname.txt"
-    start "" /wait "%%b" /S
-    del /f /q "%%b"
-)
-for %%b in (%SystemDrive%\Windows\Setup\Run\2\*.msi) do (
-    echo [OSC] 正在安装预装软件 %%b ...>"%systemdrive%\Windows\Setup\wallname.txt"
-    start "" /wait "%%b" /passive /qb-! /norestart
-    del /f /q "%%b"
-)
-for %%b in (%SystemDrive%\Windows\Setup\Run\2\*.reg) do (
-    echo [OSC] 正在应用注册表 %%b ...>"%systemdrive%\Windows\Setup\wallname.txt"
-    regedit /s "%%b"
-    del /f /q "%%b"
-)
-
-if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
-    for %%a in (C D E F G H) do (
-        if exist "%%a:\PanDaTech\OSC\api2.bat" (
-            echo [OSC] 正在应用搜到的 DIY 接口 %%a:\~\api2.bat...>"%systemdrive%\Windows\Setup\wallname.txt"
-            start "" /max /wait "%%a:\PanDaTech\OSC\api2.bat"
-        )
-        for %%b in (%%a:\PanDaTech\OSC\2\*.exe) do (
-            echo [OSC] 正在运行搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
-            start "" /wait "%%b" /S
-            del /f /q "%%b"
-        )
-        for %%b in (%%a:\PanDaTech\OSC\2\*.msi) do (
-            echo [OSC] 正在安装搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
-            start "" /wait "%%b" /passive /qb-! /norestart
-            del /f /q "%%b"
-        )
-        for %%b in (%%a:\PanDaTech\OSC\2\*.reg) do (
-            echo [OSC] 正在应用搜到的 %%b...>"%systemdrive%\Windows\Setup\wallname.txt"
-            regedit /s "%%b"
-            del /f /q "%%b"
-        )
-    )
-)
 
 :afterlife
 echo [OSC] 正在处理后续事项...>"%systemdrive%\Windows\Setup\wallname.txt"

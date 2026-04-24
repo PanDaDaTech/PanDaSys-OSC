@@ -247,7 +247,7 @@ if %osver% LEQ 3 if %osver% GEQ 2 echo y | start "" /min /wait "%~dp0apifiles\EO
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
     Dism /online /Disable-Feature /featurename:Windows-Defender-ApplicationGuard
-    Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions 
+    Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
@@ -375,6 +375,7 @@ if %osver% GEQ 3 (
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
 )
+
 echo 关闭 Edge OneDrive
 if %osver% GEQ 4 (
     taskkill /f /im msedge.exe
