@@ -246,8 +246,6 @@ ver | find "10.0.10" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 if %osver% LEQ 3 if %osver% GEQ 2 echo y | start "" /min /wait "%~dp0apifiles\EOSNotify.bat"
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
-    Dism /online /Disable-Feature /featurename:Windows-Defender-ApplicationGuard /NoRestart
-    Dism /online /Disable-Feature /featurename:Windows-Defender-Default-Definitions /NoRestart
     powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"

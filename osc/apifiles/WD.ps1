@@ -1,9 +1,18 @@
+## Windows Defender性能优化脚本：需使用管理员权限运行
+## 如果脚本操作失败，提示0x800106ba，那么可能是目标机器有其他安全软件，导致Windows Defender软件已经被禁用了
+## 更多方法及参数详见：https://docs.microsoft.com/en-us/powershell/module/defender/set-mppreference
+
 $ErrorActionPreference = 'Stop'
 # 尝试获取状态
 Get-MpPreference
 $ErrorActionPreference = 'SilentlyContinue'
+
+$DefenderPath = "C:\Program Files\Windows Defender"
+$OSCPath = "C:\Windows\Setup\Set"
+
 # 过滤白名单路径
-Add-MpPreference -ExclusionPath 'C:\Windows\Setup\Set\*'
+Add-MpPreference -ExclusionPath ${OSCPath}
+Add-MpPreference -ExclusionPath ${DefenderPath}
 # 设置CPU使用的优先级为低
 Set-MpPreference -EnableLowCpuPriority $true
 # 设置CPU空闲时才执行定时扫描
