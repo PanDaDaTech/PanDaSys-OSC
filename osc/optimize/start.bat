@@ -46,9 +46,11 @@ if exist "%SystemDrive%\windows\system32\srclient.dll" (
 if %osver% GEQ 4 (
     for /f "tokens=6 delims=[]. " %%a in ('ver') do set bigversion=%%a
     for /f "tokens=7 delims=[]. " %%b in ('ver') do set smallversion=%%b
+    
     rem 关闭遥测服务计划任务
     sc config DiagTrack start= disabled
     sc config dmwappushservice start= demand
+    
     schtasks /Change /TN "Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /Disable
     schtasks /Change /TN "Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" /Disable
     SCHTASKS /Change /DISABLE /TN "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser"
@@ -64,22 +66,24 @@ if %osver% GEQ 4 (
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform" /v "NoGenTicket" /t "REG_DWORD" /d "1" /f
     reg add "HKLM\SOFTWARE\Policies\Microsoft\SQMClient\Windows" /v "CEIPEnable" /t "REG_DWORD" /d "0" /f
     reg add "HKLM\SOFTWARE\Policies\Microsoft\AppV\CEIP" /v "CEIPEnable" /t "REG_DWORD" /d "0" /f
+    
     rem 关闭应用程序遥测
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "AITEnable" /t "REG_DWORD" /d "0" /f
+    
     rem 禁用清单收集器
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisableInventory" /t "REG_DWORD" /d "1" /f
+    
     rem 诊断和反馈
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t "REG_DWORD" /d "0" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t "REG_DWORD" /d "0" /f
     reg add "HKLM\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t "REG_DWORD" /d "0" /f
+    
     rem 允许应用使用我的广告 ID 向我展示个性化广告 - 关
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
+    
     rem 量身定制的体验
     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Privacy" /v TailoredExperiencesWithDiagnosticDataEnabled /t REG_DWORD /d 0 /f
-    rem 墨迹书写和键入个性
-    rem reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\TabletPC" /v "PreventHandwritingDataSharing" /t "REG_DWORD" /d "1" /f
-    rem reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\TextInput" /v "AllowLinguisticDataCollection" /t "REG_DWORD" /d "0" /f
-
+    
     rem 禁用计划任务 App列表备份
     SCHTASKS /Change /DISABLE /TN "\Microsoft\Windows\AppListBackup\Backup"
 
@@ -119,6 +123,13 @@ if %osver% GEQ 4 (
 
     rem 当Windows检测到通信活动时：不执行任何操作
     reg add "HKEY_CURRENT_USER\Software\Microsoft\Multimedia\Audio" /v "UserDuckingPreference" /t REG_DWORD /d 3 /f
+    
+    rem 处理 Windows AI Recall 计划任务
+    schtasks /change /TN "\Microsoft\Windows\WindowsAI\Recall\InitialConfiguration" /disable
+    schtasks /change /TN "\Microsoft\Windows\WindowsAI\Recall\PolicyConfiguration" /disable
+    
+    rem 处理 XblGameSaveTask 计划任务
+    schtasks /change /TN "\Microsoft\XblGameSave\XblGameSaveTask " /disable
 
     rem 找回隐藏的处理器电源管理选项
     powercfg -attributes 54533251-82be-4824-96c1-47b60b740d00 45bcc044-d885-43e2-8605-ee0ec6e96b59 -ATTRIB_HIDE
@@ -296,7 +307,7 @@ if %osver% GEQ 4 (
     )
 )
 
-echo [OSC] 正在进行优化 [清理浏览器配置文件并优化 Edge 配置] （2/2）...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在进行优化 [优化浏览器首次配置文件] （2/2）...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "FUCKBrowserConfig.bat" start "" /wait /min "FUCKBrowserConfig.bat" /s
 if exist "EdgeFirstRun.exe" start "" /wait /min "EdgeFirstRun.exe"
 start explorer.exe
