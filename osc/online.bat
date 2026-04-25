@@ -2,13 +2,6 @@ chcp 936 > nul
 title OSConline
 cd /d "%~dp0"
 
-if exist pack.7z (
-    echo [OSC]ÕýÔÚ½âÑ¹pack...>"%systemdrive%\Windows\Setup\wallname.txt"
-    %zip% x -r -y -p123 pack.7z
-    del /f /q pack.7z
-    echo ok >unpacked.log
-)
-
 if exist "%SystemDrive%\Windows\Setup\Set\zjsoftforceoffline.txt" goto offline
 if exist "%SystemDrive%\Windows\Setup\zjsoftforceoffline.txt" goto offline
 ping www.aliyun.com -4 -n 2 >nul
@@ -23,10 +16,6 @@ goto offline
 :offline
 if exist oscoffline.bat (
     copy /y oscoffline.bat osconline.bat
-    goto online
-)
-if exist pack.bat (
-    copy /y pack.bat osconline.bat
     goto online
 )
 goto local2
