@@ -149,6 +149,8 @@ mkdir "%APPDATA%\Microsoft\Windows\Network Shortcuts"
 del /f /s /q "%LOCALAPPDATA%\ConnectedDevicesPlatform\ActivitiesCache*"
 del /f /s /q "%UserProfile%\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations\*.*"
 del /f /s /q "%UserProfile%\AppData\Roaming\Microsoft\Windows\Recent\CustomDestinations\*.*"
+del /a /f /q "%localappdata%\Microsoft\Windows\Explorer\iconcache*"
+del /a /f /q "%localappdata%\Microsoft\Windows\Explorer\thumbcache*"
 
 ipconfig /release
 ipconfig /release6
