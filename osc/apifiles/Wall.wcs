@@ -6,6 +6,14 @@
 // 获取分辨率
 SCRN ScrW,ScrH
 
+// 用 API 方式自动识别 DPI（Vista 以上）
+// Windows 10 1703+
+CALL $user32.dll,SetProcessDpiAwarenessContext,#-5
+// Windows 8.1
+CALL $Shcore.dll,SetProcessDpiAwareness,#2
+// Windows Vista
+CALL $user32.dll,SetProcessDPIAware
+
 // 重设标题
 ENVI Name=系统正在安装/部署/优化中，请勿操作电脑！
 WRIT "%SystemDrive%\Windows\Setup\wallname.txt",$1,%Name%
