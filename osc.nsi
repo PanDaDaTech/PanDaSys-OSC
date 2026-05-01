@@ -14,6 +14,9 @@ SetCompressorDictSize 32
 !include "FileFunc.nsh"
 !include "LogicLib.nsh"
 
+SetFont "Microsoft Yahei UI" 9
+ManifestDPIAware true
+
 ; ------ MUI 现代界面定义 (1.67 版本以上兼容) ------
 !include "MUI.nsh"
 
