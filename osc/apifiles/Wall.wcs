@@ -115,9 +115,11 @@ _END
 
 _SUB SYSINFO
     
-    // 信息区域
+// 信息区域
     CALC 信息左=48
-    CALC 信息上=%ScrH%-42-210
+    CALC 信息条左=%信息左%+80
+    // CALC 信息上=0
+    CALC 信息上=%ScrH%-42-150
 
     LABE -left -trans ,L%信息左%T%信息上%W500H30,处理器,,0xffffff,14
     CALC 信息上=%信息上%+30
@@ -130,19 +132,44 @@ _SUB SYSINFO
     TEAM FIND MEM=?,总内存|CALC 内存=%总内存%/1024#2
     LABE -left -trans 内存情况L,L%信息左%T%信息上%W500H30,%内存% GB,,0xffffff,12
     CALC 信息上=%信息上%+30
-    
-    LABE -left -trans ,L%信息左%T%信息上%W500H30,主板,,0xffffff,14
-    CALC 信息上=%信息上%+30
-    REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardManufacturer,主板厂商
-    REGI .HKLM\HARDWARE\DESCRIPTION\System\BIOS\BaseBoardProduct,主板型号
-    IFEX ! |%主板厂商%=,
-    {
-        LABE -left -trans ,L%信息左%T%信息上%W500H30,%主板厂商% %主板型号%,,0xffffff,12
-        CALC 信息上=%信息上%+30
-        
-    }   
-    
 
+    // LABE -left -trans ,L10T10W500H30,计算最终高度：%信息上%,,0xffffff,12
+_END
+
+_SUB 刷新分辨率
+    SCRN ScrWnew,ScrHnew
+    IFEX [#%ScrW%<>%ScrWnew% | #%ScrH%<>%ScrHnew%],
+    {
+        EXEC --nowait PECMD LOAD %CurFile%
+        KILL \
+    }
+_END
+
+_SUB 刷新标题
+    READ "%SystemDrive%\Windows\Setup\wallname.txt",1,NameNew
+    IFEX |%NameNew%<>%Name%,
+    {
+        ENVI Name=%NameNew%
+        ENVI @LABE1=%Name%
+    }
+    IFEX |%NameNew%=exit,
+    {
+        CALL 显示任务栏
+        FILE "%SystemDrive%\Windows\Setup\wallname.txt"
+        EXIT FILE
+    }
+_END
+
+_SUB 刷新检测
+    IFEX MEM=?,可用内存
+    CALC 已用内存=(%总内存%-%可用内存%)/1024#2
+    ENVI 内存情况L1=%内存% GB (总) / %已用内存% GB (已用) 
+    IFEX ! |%内存情况L%=%内存情况L1%,
+    {
+        ENVI @内存情况L=%内存情况L1%
+	    CALC 内存百分比=100-%可用内存%/%总内存%*100#0
+	    ENVI @内存情况P=%内存百分比%% %内存百分比%%
+    }
 _END
 
 _SUB 刷新分辨率
@@ -168,6 +195,20 @@ _SUB 刷新标题
         EXIT FILE
     }
 _END
+
+_SUB 刷新检测
+FIND --pid TMS,
+MSTR I2,T2=<1*>%TMS%
+CALC #I21=%I2%-%I1%
+CALC #T21=%T2%-%T1%
+CALC P=100-100*%I21%/%T21%/%CPUS%##1
+IFEX |%P%=-0.0,ENVI P=0
+
+    IFEX MEM=?,可用内存
+    CALC 已用内存=(%总内存%-%可用内存%)/1024#2
+    ENVI 内存情况L1=%内存% GB (总)% / 已用内存% GB (已用)
+_END
+
 
 _SUB 任务栏监控
     IFEX |%任务栏%=开,CALL 显示任务栏
