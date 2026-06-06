@@ -58,14 +58,13 @@ _SUB DRAW
     EXEC*N VER=!CMD.EXE /C VER
     MSTR * VER=<-1>VER
     MSTR * VER=-2,0,VER
-    REGI .HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\BuildLabEx,BuildLabEx
-    MSTR * -delims:. SPBuild=<2>BuildLabEx
-    IFEX #%SPBuild%>1,ENVI VER=%VER%.%SPBuild%
-    REGI .HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\BuildLabEx,内部版本
+    REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProductName,产品名称
+    REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CurrentBuildNumber,系统构建号
+    IFEX #%系统构建号%>=22000,SED 产品名称=1,Windows 10,Windows 11,%产品名称%
     REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\DisplayVersion,显示版本
     IFEX |%显示版本%=,REGI .HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\CSDVersion,显示版本
     ENVI ?系统架构=PEBIT,%windir%\system32
-    LABE -center -trans ,L0T%信息上%W%ScrW%H30,系统版本 %显示版本% [%VER%] | 系统架构 %系统架构% | Powered By PanDaSys-OSC Ver %OSCVER%,,0xffffff,10
+    LABE -center -trans ,L0T%信息上%W%ScrW%H30,系统版本 %产品名称% %显示版本% [%VER%] %系统架构% | Powered By PanDaSys-OSC Ver %OSCVER%,,0xffffff,10
     CALC 信息上=%信息上%
 
     CALL SYSINFO
