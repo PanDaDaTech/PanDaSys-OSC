@@ -95,9 +95,7 @@ else {
 }
 Write-Host "version: $env:GITHUB_WORKFLOW_VERSION"
 Write-Host "nsisDir: $nsisDir"
-if (Test-Path 'osc\xrsoft.exe') {
-    Write-Host "xrsoft.exe already exists."
-}
+
 else {
     # 下载所需文件
     # Get-LanzouFile -Uri "https://xrgzs.lanzouv.com/idHOf2bfs3te" -OutFile "osc\xrkms\KMS_VL_ALL_AIO.cmd"
