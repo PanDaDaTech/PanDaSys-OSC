@@ -121,7 +121,6 @@ Test-SHA256 -Hashes @{
 if (-not $env:GITHUB_WORKFLOW_VERSION) {
     $env:GITHUB_WORKFLOW_VERSION = "2.6.0.0"
 }
-
 Set-Content -Path "osc\apifiles\Version.txt" -Value $env:GITHUB_WORKFLOW_VERSION
 & "$nsisDir\makensis.exe" /V4 /DCUSTOM_VERSION=$env:GITHUB_WORKFLOW_VERSION "osc.nsi" || exit 1
 
