@@ -33,7 +33,7 @@ if %osver% GEQ 4 (
 )
 
 :main
-if exist "%SystemDrive%\Windows\Setup\xrsysdark.txt" (
+if exist "%SystemDrive%\Windows\Setup\pandasysdark.txt" (
     if exist "%SystemDrive%\Windows\Resources\Themes\dark.theme" (
         start "" "%SystemDrive%\Windows\Resources\Themes\dark.theme"
     )
@@ -65,12 +65,3 @@ if exist wallpaper.jpg (
 )
 reg delete "HKCU\Control Panel\Desktop" /f /v "Wallpaper.PECMD"
 exit
-
-:touch
-if exist "%ProgramW6432%" (
-    PinToTaskbar.exe /pin "%SystemDrive%\Windows\System32\osk.exe"
-) else (
-    %PECMD% PINT "%SystemDrive%\Windows\System32\osk.exe",TaskBand
-)
-regedit /s touch.reg
-goto :EOF

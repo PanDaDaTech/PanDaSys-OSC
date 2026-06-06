@@ -246,7 +246,7 @@ ver | find "10.0.10" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 if %osver% LEQ 3 if %osver% GEQ 2 echo y | start "" /min /wait "%~dp0apifiles\EOSNotify.bat"
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
-    powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
+    powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
     start "" /wait /min "%~dp0apifiles\Wub.exe" /D /P
@@ -290,7 +290,7 @@ if %osver% GEQ 2 (
     if exist "%SystemDrive%\Windows\System32\wbem\WMIC.exe" (
         wmic computersystem where name="%computername%" set AutomaticManagedPagefile=True
     ) else (
-        powershell -Command "Get-WmiObject -Class Win32_computersystem | Set-WmiInstance -Property @{AutomaticManagedPagefile=$false}"
+        powershell -NoLogo -NoProfile -Command "Get-WmiObject -Class Win32_computersystem | Set-WmiInstance -Property @{AutomaticManagedPagefile=$false}"
     )
 )
 
@@ -319,7 +319,7 @@ title 登录时系统处理（请勿关闭此窗口）
 taskkill /f /im explorer.exe
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
-    powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
+    powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     echo 关闭保留储存
     reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager" /v ShippedWithReserves /t REG_DWORD /d 0 /f
@@ -370,7 +370,7 @@ echo win8-11系统APPX、WD、WU驱动处理
 if %osver% GEQ 3 (
     regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
-    powershell -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"
+    powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
 )
 
@@ -392,7 +392,7 @@ echo 修复用户密码过期问题
 Net Accounts /MaxPwAge:Unlimited
 %netuser% %USERNAME% /pwnexp:y
 wmic useraccount where "name='%username%'" set PasswordExpires=FALSE
-powershell -Command "Set-LocalUser -Name '%username%' -PasswordNeverExpires $true"
+powershell -NoLogo -NoProfile -Command "Set-LocalUser -Name '%username%' -PasswordNeverExpires $true"
 
 echo 恢复环境配置
 reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\SystemRestore" /v DisableSR /f

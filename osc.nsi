@@ -223,11 +223,6 @@ SectionGroup "优化设置"
     FileOpen $0 "$WINDIR\Setup\pandasysnopcname.txt" w
     FileClose $0
   SectionEnd
-  Section /o "强制禁用基于虚拟化安全性及内存完整性检查（VBS）"
-    DetailPrint "正在输出 TAG - pandasysfkvbs..."
-    FileOpen $0 "$WINDIR\Setup\pandasysfkvbs.txt" w
-    FileClose $0
-  SectionEnd
 SectionGroupEnd
 
 Section "-PanDaSys 优化组件" PanDaSysOSC

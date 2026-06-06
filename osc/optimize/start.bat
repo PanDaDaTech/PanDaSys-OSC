@@ -269,6 +269,10 @@ if %osver% GEQ 4 (
             echo 启用右键单击即可在任务栏中启用结束任务
             reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings /v TaskbarEndTask /t REG_DWORD /d 1 /f
         )
+        if !bigversion! LEQ 22635 (
+            echo 恢复传统右键菜单
+            reg add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
+        )
         if !bigversion! GEQ 26100 (
             if exist "%SystemDrive%\Windows\System32\sudo.exe" (
                 echo 启用 sudo
@@ -276,6 +280,30 @@ if %osver% GEQ 4 (
             )
         )
     )
+
+    if exist "start2.bin" if exist "%LocalAppData%\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState\start2.bin" (
+        echo 替换开始菜单固定文件
+        copy /y "start2.bin" "%LocalAppData%\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState\start2.bin"
+    )
+
+    echo 优化任务栏固定项
+    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /f /v "Favorites"
+    reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /f /v "FavoritesResolve"
+    for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows\Tablet PC" /v DeviceKind') do if /i not "%%a"=="0x0"
+        regedit /s touch.reg
+        if exist "%ProgramW6432%" (
+            PinToTaskbar.exe /pin "%SystemDrive%\Windows\System32\osk.exe"
+        ) else (
+            %PECMD% PINT "%SystemDrive%\Windows\System32\osk.exe",TaskBand
+        )
+    )
+
+    if exist %AppData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk (
+        PinToTaskbar.exe /pin "%AppData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk"
+    ) else (
+        %PECMD% PINT "%AppData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk",TaskBand
+    )
+
 ) else if %osver% GEQ 2 (
     schtasks /change /tn "\Microsoft\Windows\SystemRestore\SR" /disable 
     schtasks /change /tn "\Microsoft\Windows\Windows Error Reporting\QueueReporting" /disable 
@@ -293,22 +321,15 @@ if %osver% GEQ 4 (
     schtasks /change /tn "\Microsoft\Windows\Media Center\mcupdate" /disable 
 )
 
-if %osver% GEQ 4 (
-    for /f "tokens=6 delims=[]. " %%a in ('ver') do set bigversion=%%a
-    for /f "tokens=7 delims=[]. " %%b in ('ver') do set smallversion=%%b
-    if !bigversion! GEQ 22000 (
-        echo 处理 Win11 开始菜单固定项（去除 Outlook、DevHome、微软电脑管家固定）
-        if exist "startmenu11.ppkg" (
-            echo 安装预配包
-            powershell -Command "Install-ProvisioningPackage -PackagePath .\startmenu11.ppkg -ForceInstall -QuietInstall"
-            echo 卸载预配包
-            powershell -Command "Uninstall-ProvisioningPackage -PackagePath .\startmenu11.ppkg"
-        )
-    )
-)
-
 echo [OSC] 正在进行优化 [优化浏览器首次配置文件] （2/2）...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "FUCKBrowserConfig.bat" start "" /wait /min "FUCKBrowserConfig.bat" /s
 if exist "EdgeFirstRun.exe" start "" /wait /min "EdgeFirstRun.exe"
 start explorer.exe
+
+if %osver% GEQ 4 (
+    for /f "tokens=6 delims=[]. " %%a in ('ver') do set bigversion=%%a
+    for /f "tokens=7 delims=[]. " %%b in ('ver') do set smallversion=%%b
+    echo Win10+选择应用在锁屏上显示详细状态-无
+    powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "LockScreenStatus.ps1"
+)
 exit

@@ -56,9 +56,9 @@ if /i "%SystemDrive%"=="x:" if exist "X:\Windows\System32\PECMD.EXE" (
 :mainprogram
 if %osver% GEQ 3 (
     echo Win8-11 系统 APPX、WD 处理
-    powershell -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
+    powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
-    powershell -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"
+    powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "%~dp0apifiles\uninstallAppx.ps1"
     reg import "%~dp0apifiles\mspcmgr.reg" /reg:32
     
     echo 禁止自动安装微软电脑管家
@@ -124,31 +124,6 @@ if exist "%SystemDrive%\Windows\Setup\pandasyssearchapi.txt" (
     )
 )
 
-:FuckVBS
-if exist "%systemdrive%\Windows\Setup\pandasysfkvbs.txt" (
-    if %osver% GEQ 3 (
-        echo [OSC] 正在强制禁用 VBS 及内存完整性检查...（可能需要几分钟的时间）
-        DISM.exe /Online /Disable-Feature:Containers-DisposableClientVM /NoRestart
-        DISM.exe /Online /Disable-Feature:VirtualMachinePlatform /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-Clients /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Services /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Hypervisor /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Management-PowserShell /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Tools-All /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V /NoRestart
-        DISM.exe /Online /Disable-Feature:HypervisorPlatform /NoRestart
-        DISM.exe /Online /Disable-Feature:Microsoft-Hyper-V-Online /NoRestart
-        DISM.exe /Online /Disable-Feature:IsolatedUserMode /NoRestart
-
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity" /f /v "enabled" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "RequirePlatformSecurityFeatures" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "EnableVirtualizationBasedSecurity" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "SecureBiometrics" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Control\DeviceGuard" /f /v "WindowsHello" /t REG_DWORD /d 0
-        reg add "HKLM\system\ControlSet001\Services\HvHost" /f /v "Start" /t REG_DWORD /d 4
-    )
-)
-
 :optimize
 if exist "optimize\start.bat" (
     echo y | start "" /wait /min "optimize\start.bat"
@@ -191,7 +166,7 @@ if exist "%SystemDrive%\Windows\Setup\zjsoftspoem.txt" (
 if exist "%SystemDrive%\Windows\System32\wbem\WMIC.exe" (
     wmic computersystem where "caption='%computername%'" call Rename name='%pcname%'
 ) else (
-    powershell -Command "Rename-Computer -NewName '%pcname%' -Force"
+    powershell -NoLogo -NoProfile -Command "Rename-Computer -NewName '%pcname%' -Force"
 )
 reg add "HKCU\Software\Microsoft\Windows\ShellNoRoam" /f /ve /t REG_SZ /d "%pcname%"
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" /f /v "ComputerName" /t REG_SZ /d "%pcname%"
