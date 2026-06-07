@@ -3,8 +3,8 @@ setlocal enabledelayedexpansion
 @echo off
 color 1f
 cd /d "%~dp0"
+::…Ë÷√±‰¡ø
 if exist "%SystemDrive%\Windows\SysWOW64\wscript.exe" (
-    set "PROCESSOR_ARCHITECTURE=AMD64"
     move /y "%~dp0apifiles\PECMD64.EXE" "%~dp0apifiles\PECMD.EXE"
 )
 set dmi="%~dp0apifiles\DMI.exe"
