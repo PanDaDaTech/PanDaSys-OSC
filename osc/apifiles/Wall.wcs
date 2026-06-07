@@ -149,7 +149,7 @@ _SUB 刷新标题
     IFEX |%NameNew%<>%Name%,
     {
         ENVI Name=%NameNew%
-        ENVI @LABE1=%Name%
+        ENVI @LABE2=%Name%
     }
     IFEX |%NameNew%=exit,
     {
