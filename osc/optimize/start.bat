@@ -234,6 +234,9 @@ if %osver% GEQ 4 (
     for /f "delims=*" %%a in ('reg.exe query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\CloudStore\Store\Cache\DefaultAccount ^| find /i "}$$windows.data.unifiedtile.startglobalproperties"') do (
         reg.exe add "%%a\Current" /v "Data" /t REG_BINARY /d "0200000061F31E4D36CBDB010000000043420100C21401CB320A0305CEABD3E90224DAF40344C38A016682E58BB1AEFDFDBB3C0005A08FFCC103248AD0034480990166B0B599DCCDB097DE4D00058691CC930524AAA30144C38401669FF79DB187CBD1ACD40100C23C01C55A0100" /f
     )
+
+    echo 关闭文件夹前面的勾选框
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /f /v "CheckBoxes" /t REG_DWORD /d 0
     
     echo 启用任务管理器显示磁盘性能
     if exist "%systemdrive%\Windows\System32\diskperf.exe" diskperf -y
@@ -289,19 +292,12 @@ if %osver% GEQ 4 (
     echo 优化任务栏固定项
     reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /f /v "Favorites"
     reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /f /v "FavoritesResolve"
-    for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows\Tablet PC" /v DeviceKind') do if /i not "%%a"=="0x0"
-        regedit /s touch.reg
-        if exist "%ProgramW6432%" (
-            PinToTaskbar.exe /pin "%SystemDrive%\Windows\System32\osk.exe"
-        ) else (
-            %PECMD% PINT "%SystemDrive%\Windows\System32\osk.exe",TaskBand
-        )
-    )
+    del /a /f /q "%AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*.lnk"
 
-    if exist %AppData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk (
-        PinToTaskbar.exe /pin "%AppData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk"
+    if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" (
+        PinToTaskbar.exe /pin "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk"
     ) else (
-        %PECMD% PINT "%AppData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk",TaskBand
+        %PECMD% PINT "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk",TaskBand
     )
 
 ) else if %osver% GEQ 2 (
