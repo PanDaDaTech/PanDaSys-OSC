@@ -153,7 +153,10 @@ if exist "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe" (
     echo [API] 正在应用驱动总裁...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe"
     echo %SystemDrive%\WINDOWS\WinDrive\DcLoader.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-)
+) else if exist "%SystemDrive%\WINDOWS\WinDrive\*.ini" (
+    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
+    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe"
+    start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe" /wandrv
 
 if exist wandrv.iso (
     echo [API] 正在应用万能驱动 wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
