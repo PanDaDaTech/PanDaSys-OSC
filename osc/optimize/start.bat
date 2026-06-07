@@ -317,9 +317,14 @@ if %osver% GEQ 4 (
     schtasks /change /tn "\Microsoft\Windows\Media Center\mcupdate" /disable 
 )
 
-echo [OSC] 正在进行优化 [优化浏览器首次配置文件] （2/2）...>"%systemdrive%\Windows\Setup\wallname.txt"
+echo [OSC] 正在进行优化 [优化浏览器配置文件] （2/2）...>"%systemdrive%\Windows\Setup\wallname.txt"
 if exist "FUCKBrowserConfig.bat" start "" /wait /min "FUCKBrowserConfig.bat" /s
-if exist "EdgeFirstRun.exe" start "" /wait /min "EdgeFirstRun.exe"
+if %osver% GEQ 2 (
+    taskkill /f /im msedge.exe
+    rd /s /q "%LocalAppData%\Microsoft\Edge\User Data"
+    mkdir "%LocalAppData%\Microsoft\Edge\User Data"
+    xcopy /E /C /I /H /R /Y "User Data" "%LocalAppData%\Microsoft\Edge\User Data"
+)
 start explorer.exe
 
 if %osver% GEQ 4 (
