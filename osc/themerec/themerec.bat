@@ -17,8 +17,8 @@ ver | find /i "10.0." > nul && (
     for /f "tokens=7 delims=[]. " %%b in ('ver') do set smallversion=%%b
 )
 
-if exist "%SystemDrive%\Windows\Setup\xrsyswall.jpg" (
-    copy /y "%SystemDrive%\Windows\Setup\xrsyswall.jpg" wallpaper.jpg
+if exist "%SystemDrive%\Windows\Setup\pandasyswall.jpg" (
+    copy /y "%SystemDrive%\Windows\Setup\pandasyswall.jpg" wallpaper.jpg
 )
 if exist "%SystemDrive%\Windows\Setup\Set\wallpaper.jpg" (
     copy /y "%SystemDrive%\Windows\Setup\Set\wallpaper.jpg" wallpaper.jpg
@@ -26,10 +26,6 @@ if exist "%SystemDrive%\Windows\Setup\Set\wallpaper.jpg" (
 
 if %osver% GEQ 2 (
     for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows\Tablet PC" /v DeviceKind') do if /i not "%%a"=="0x0" call :touch
-)
-
-if %osver% GEQ 4 (
-    if !bigversion! GEQ 22000 call :startmenu11
 )
 
 :main
@@ -53,7 +49,7 @@ goto setwall
 :setwall
 cd /d "%~dp0"
 timeout /t 5
-if exist "%SystemDrive%\Windows\Setup\xrsysnowall.txt" exit
+if exist "%SystemDrive%\Windows\Setup\pandasysnowall.txt" exit
 if exist wallpaper.jpg (
     copy /y wallpaper.jpg "%SystemDrive%\Windows\Version.jpg"
     %PECMD% WALL "%SystemDrive%\Windows\Version.jpg"
@@ -65,3 +61,13 @@ if exist wallpaper.jpg (
 )
 reg delete "HKCU\Control Panel\Desktop" /f /v "Wallpaper.PECMD"
 exit
+
+:touch
+if exist "%ProgramW6432%" (
+    PinToTaskbar.exe /pin "%SystemDrive%\Windows\System32\osk.exe"
+) else (
+    %PECMD% PINT "%SystemDrive%\Windows\System32\osk.exe",TaskBand
+)
+regedit /s touch.reg
+goto :EOF
+

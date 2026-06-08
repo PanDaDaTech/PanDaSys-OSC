@@ -134,10 +134,15 @@ goto end
 title 部署中系统处理（请勿关闭此窗口）
 
 ::应用系统驱动
+if exist pandasysdrv.zip (
+    echo [API] 正在解压驱动 .zip...>"%systemdrive%\Windows\Setup\wallname.txt"
+    %zip% e -r -y pandasysdrv.zip
+    del /f /q wandrv.iso
+)
+rem ARM64 不支持挂载，需要解压
 if exist wandrv.iso if /i "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
-    echo [API] 正在解压驱动.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
-    echo %zip% e -r -y wandrv.iso >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
-    %zip% e -r -y wandrv.iso >>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
+    echo [API] 正在解压驱动 .iso...>"%systemdrive%\Windows\Setup\wallname.txt"
+    %zip% e -r -y wandrv.iso 
     del /f /q wandrv.iso
 )
 if %osver% GEQ 2 if exist CeoMSX.wim (
@@ -152,12 +157,54 @@ if %osver% GEQ 2 if exist CeoMSX.wim (
 if exist "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe" (
     echo [API] 正在应用驱动总裁...>"%systemdrive%\Windows\Setup\wallname.txt"
     start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DcLoader.exe"
-    echo %SystemDrive%\WINDOWS\WinDrive\DcLoader.exe>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
+) else if exist "%SystemDrive%\WINDOWS\WinDrive\SDI*.exe" (
+    for %%a in ("%SystemDrive%\WINDOWS\WinDrive\SDI*.exe") do (
+        if /i "PROCESSOR_ARCHITECTURE"=="AMD64" (
+            echo %%~na | find /i "64" && (
+                echo [API]正在应用Snappy Driver Installer x64...>"%systemdrive%\Windows\Setup\wallname.txt"
+                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex 
+            )
+        )
+        if /i "PROCESSOR_ARCHITECTURE"=="x86" (
+            echo %%~na | find /i "64" || (
+                echo [API]正在应用Snappy Driver Installer x86...>"%systemdrive%\Windows\Setup\wallname.txt"
+                "%%a" -hintdelay:1500 -license:1 -expertmode -onlyupdates -autoinstall -autoclose -keepunpackedindex 
+            )
+        )  
+    )
 ) else if exist "%SystemDrive%\WINDOWS\WinDrive\*.ini" (
     echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe"
     start "" /wait "%SystemDrive%\WINDOWS\WinDrive\DriveCleaner.exe" /wandrv
-
+) else if exist "%SystemDrive%\Sysprep\Drivers\*.ini" (
+    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
+    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\Drivers\DriveCleaner.exe"
+    start "" /wait "%SystemDrive%\Sysprep\Drivers\DriveCleaner.exe" /wandrv
+) else if exist "%SystemDrive%\Sysprep\drvceo.ini" (
+    echo [API] 正在应用驱动总裁...>"%systemdrive%\Windows\Setup\wallname.txt"
+    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
+    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
+) else if exist "%SystemDrive%\Sysprep\wandr*.exe" (
+    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
+    for %%a in (%SystemDrive%\Sysprep\wandr*.exe) do move /y "%%a" "%%~dpawandrv.exe"
+    for %%a in (%SystemDrive%\Sysprep\wandr*.ini) do move /y "%%a" "%%~dpawandrv.ini"
+    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
+    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
+) else if exist "%SystemDrive%\Sysprep\*wandrv6.exe" (
+    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
+    for %%a in (%SystemDrive%\Sysprep\*wandrv6.exe) do move /y "%%a" "%%~dpawandrv.exe"
+    for %%a in (%SystemDrive%\Sysprep\*wandrv6.ini) do move /y "%%a" "%%~dpawandrv.ini"
+    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
+    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
+) else if exist "%SystemDrive%\Sysprep\easydr*.exe" (
+    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
+    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\Sysprep\DriveCleaner.exe"
+    start "" /wait "%SystemDrive%\Sysprep\DriveCleaner.exe" /wandrv
+) else if exist "%SystemDrive%\wandrv\wandrv.exe" (
+    echo [API] 正在应用万能驱动...>"%systemdrive%\Windows\Setup\wallname.txt"
+    copy /y "%~dp0apifiles\DriveCleaner.exe" "%SystemDrive%\wandrv\DriveCleaner.exe"
+    start "" /wait "%SystemDrive%\wandrv\DriveCleaner.exe" /wandrv
+)
 if exist wandrv.iso (
     echo [API] 正在应用万能驱动 wandrv.iso...>"%systemdrive%\Windows\Setup\wallname.txt"
     rd /s /q "%SystemDrive%\WINDOWS\WinDrive\"
@@ -165,7 +212,6 @@ if exist wandrv.iso (
     move /y "%~dp0wandrv.iso" "%~dp0wandrv\wandrv.iso"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv\DriveCleaner.exe"
     start "" /wait "%~dp0wandrv\DriveCleaner.exe" /wandrv
-    echo wandrv.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
     del /f /q "%~dp0wandrv\wandrv.iso"
 )
 if exist wandrv2.iso (
@@ -174,7 +220,6 @@ if exist wandrv2.iso (
     move /y "%~dp0wandrv2.iso" "%~dp0wandrv2\wandrv.iso"
     copy /y "%~dp0apifiles\DriveCleaner.exe" "%~dp0wandrv2\DriveCleaner.exe"
     start "" /wait "%~dp0wandrv2\DriveCleaner.exe" /wandrv
-    echo wandrv2.iso>>"%systemdrive%\Windows\Setup\pandasysdriverdebug.log"
     del /f /q "%~dp0wandrv\wandrv.iso"
 )
 
@@ -183,7 +228,6 @@ rd /s /q "%~dp0wandrv2"
 rd /s /q "%SystemDrive%\WINDOWS\WinDrive"
 rd /s /q "%SystemDrive%\Sysprep\Drivers"
 del /f /s /q "%SystemDrive%\Sysprep\*.7z"
-
 
 cd /d "%~dp0"
 for %%a in (InDeploy\*.exe) do (

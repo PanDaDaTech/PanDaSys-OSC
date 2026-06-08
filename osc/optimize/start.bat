@@ -294,12 +294,6 @@ if %osver% GEQ 4 (
     reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" /f /v "FavoritesResolve"
     del /a /f /q "%AppData%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*.lnk"
 
-    if exist "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" (
-        PinToTaskbar.exe /pin "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk"
-    ) else (
-        %PECMD% PINT "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk",TaskBand
-    )
-
 ) else if %osver% GEQ 2 (
     schtasks /change /tn "\Microsoft\Windows\SystemRestore\SR" /disable 
     schtasks /change /tn "\Microsoft\Windows\Windows Error Reporting\QueueReporting" /disable 
@@ -332,5 +326,10 @@ if %osver% GEQ 4 (
     for /f "tokens=7 delims=[]. " %%b in ('ver') do set smallversion=%%b
     echo Win10+选择应用在锁屏上显示详细状态-无
     powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "LockScreenStatus.ps1"
+    if !smallversion! GEQ 26100 (
+        echo Win11移除固定的新版Outlook任务栏图标
+        powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "removeOutlookNewTaskbar.ps1"
+    )
 )
+
 exit
