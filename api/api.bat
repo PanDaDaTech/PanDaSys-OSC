@@ -293,6 +293,10 @@ ver | find "10.0.10" && echo 1>"%systemdrive%\Windows\Setup\pandasysnowu.txt"
 if %osver% LEQ 3 if %osver% GEQ 2 echo y | start "" /min /wait "%~dp0apifiles\EOSNotify.bat"
 if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
+    rem 提前禁用 Smart App Control，防止部署进程失败
+    if exist "%systemdrive%\Windows\System32\CiTool.exe" (
+        reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /f /v "VerifiedAndReputablePolicyState" /t REG_DWORD /d 0
+    )
     powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WUdrivers-disable.reg"
@@ -321,6 +325,7 @@ if %osver% GEQ 3 (
     ) else (
         bcdedit /set hypervisorlaunchtype off
     )
+)
 
     echo 关闭显示首次登录动画
     reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v EnableFirstLogonAnimation /t REG_DWORD /d 0 /f
