@@ -369,8 +369,13 @@ goto end
 :FirstLogin
 title 登录时系统处理（请勿关闭此窗口）
 taskkill /f /im explorer.exe
-if %osver% GEQ 3 (
     echo Win8-11 系统 WD、WU 驱动处理
+    if %osver% GEQ 3 (
+        rem 提前禁用 Smart App Control，防止部署进程失败
+        if exist "%systemdrive%\Windows\System32\CiTool.exe" (
+            reg add "HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy" /f /v "VerifiedAndReputablePolicyState" /t REG_DWORD /d 0
+        )
+    )
     powershell -NoLogo -NoProfile -ExecutionPolicy bypass -File "%~dp0apifiles\WD.ps1"
     "%nsudo%" -U:T -P:E -wait regedit /s "%~dp0apifiles\WDDisable.reg"
     echo 关闭保留储存
