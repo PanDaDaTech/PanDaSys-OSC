@@ -260,10 +260,13 @@ if %osver% GEQ 4 (
         )
     )
     if !bigversion! GEQ 22000 (
+        echo 隐藏设置中的 Apps 里的 Actions 项、AI 组件项
+        reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer /v SettingsPageVisibility /t REG_SZ /d "hide:aicomponents;appactions" /f
         echo 处理 Win11 变小了的输入法候选项字体大小（大）
         reg add HKCU\Software\Microsoft\InputMethod\CandidateWindow\CHS\1 /v FontStyleTSF3 /t REG_SZ /d "18.00pt;Regular;;Microsoft YaHei UI" /f
         if !bigversion! GEQ 22621 (
-            echo 任务栏隐藏 AI 图标
+            echo 禁用 Copilot 及隐藏相关图标
+            reg add HKCU\Software\Policies\Microsoft\Windows\WindowsCopilot /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f
             reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarAI /t REG_DWORD /d 0
             reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v ShowCopilotButton /t REG_DWORD /d 0
             echo 启用右键单击即可在任务栏中启用结束任务
